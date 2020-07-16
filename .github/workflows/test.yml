@@ -1,8 +1,7 @@
 name: BAG-Scraper and Parser
 on:
-  schedule:
-    - cron: '*/5 10-12 * * *'
-
+  workflow_dispatch
+  
 jobs:
   parse-bag:
     runs-on: ubuntu-latest
