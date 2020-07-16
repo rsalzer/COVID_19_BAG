@@ -30,7 +30,6 @@ jobs:
     - name: Run Script
       working-directory: scripts
       env:
-        TEST: 'IT WORKS!!!!'
         CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
         CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
         ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
