@@ -32,6 +32,11 @@ jobs:
       run: |
         npm start
         
+    - name: Log date
+      continue-on-error: true
+      run: |
+        echo "Date is: $date"
+        
     - name: Check if there are changes in the repo
       id: changes
       uses: UnicornGlobal/has-changes-action@v1.0.11
