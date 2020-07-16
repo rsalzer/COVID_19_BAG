@@ -31,3 +31,24 @@ jobs:
       working-directory: scripts
       run: |
         npm start
+        
+    - name: Check if there are changes in the repo
+      id: changes
+      uses: UnicornGlobal/has-changes-action@v1.0.11
+  
+    - name: Set commit message
+      env:
+        SCRAPER_KEY: ${{ matrix.canton }}
+      run: |
+        echo ::set-env name=commit_msg::Update BAG from scraper
+        fi
+    - name: Commit and push to repo
+      if: steps.changes.outputs.changed == 1 # only try to commit if there are actually changes
+      uses: github-actions-x/commit@v2.6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        push-branch: master
+        name: GitHub Action Scraper
+        email: scraper@salzer.it
+        commit-message: ${{ env.commit_msg }}
+        rebase: 'true'
