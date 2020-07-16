@@ -2,6 +2,7 @@ const https = require('https');
 const fs = require('fs');
 var Twitter = require('twitter');
 const readline = require("readline");
+const core = require('@actions/core');
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -80,6 +81,7 @@ function checkIfFileNeedsToBeDownloaded() {
       }
       else {
         console.log("We already got today ... do nothing");
+        core.setFailed("We already got today");
         rl.close();
       }
     });
