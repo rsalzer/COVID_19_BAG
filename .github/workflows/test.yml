@@ -37,8 +37,6 @@ jobs:
       uses: UnicornGlobal/has-changes-action@v1.0.11
   
     - name: Set commit message
-      env:
-        SCRAPER_KEY: ${{ matrix.canton }}
       run: |
         echo ::set-env name=commit_msg::Update BAG from scraper
         fi
