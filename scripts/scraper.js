@@ -38,7 +38,7 @@ case 'download':
     if(myArgs[1] == "append") {
       appendToFiles = true;
     }
-    downloadFile();
+    checkIfFileNeedsToBeDownloaded();
     break;
 case 'parse':
     console.log('Parsing temp.xlsx');
@@ -53,6 +53,36 @@ case 'tweet':
     break;
 default:
     console.log('Sorry, that is not something I know how to do.');
+    rl.close();
+}
+
+function checkIfFileNeedsToBeDownloaded() {
+  console.log("** Checking if today has already been downloaded **");
+  fs.readFile('../data/deaths.csv', 'utf-8', function(err, data) {
+      if (err) throw err;
+
+      var lines = data.trim().split('\n');
+      var lastLine = lines.slice(-1)[0];
+
+      var fields = lastLine.split(',');
+      var fileDate = fields[0];
+
+      let date_ob = new Date();
+      let date_now = date_ob.toISOString().substring(0,10);
+      console.log("Server time: "+date_ob.toString());
+      console.log("Server time ISO: "+date_ob.toISOString());
+      console.log("Date now = "+date_now);
+      console.log("FileDate = "+fileDate);
+
+      if(date_now!=fileDate) {
+        console.log("We have not got today yet: Download BAG-File");
+        downloadFile();
+      }
+      else {
+        console.log("We already got today ... do nothing");
+        rl.close();
+      }
+    });
 }
 
 function downloadFile() {
