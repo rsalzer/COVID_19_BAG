@@ -12,12 +12,15 @@ try {
   console.log("Using local credentials");
 } catch(e) {
   console.log("Using server credentials");
-  config = {
-    consumer_key: '',
-    consumer_secret: '',
-    access_token_key: '',
-    access_token_secret: ''
-  };
+  if(process.env.CONSUMER_KEY) {
+    console.log("We got the keys...");
+    config = {
+      consumer_key: process.env.CONSUMER_KEY,
+      consumer_secret: process.env.CONSUMER_SECRET,
+      access_token_key: process.env.ACCESS_TOKEN_KEY,
+      access_token_secret: process.env.ACCESS_TOKEN_SECRET
+    };
+  }
 }
 const excelToJson = require('convert-excel-to-json');
 const csv=require('csvtojson');
@@ -29,6 +32,8 @@ const ageLabels = ["0-9","10-19","20-29","30-39","40-49","50-59","60-69","70-79"
 var appendToFiles = false;
 
 console.log("The Test: " +  process.env.TEST);
+
+tweet("Test-Tweet frmo github actions");
 
 var myArgs = process.argv.slice(2);
 switch (myArgs[0]) {
