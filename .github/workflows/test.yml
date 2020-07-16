@@ -32,10 +32,10 @@ jobs:
       run: |
         npm start
         
-    - name: Log date
+    - name: Set commit message
       continue-on-error: true
       run: |
-        echo "Date is: $date"
+        echo ::set-env name=commit_msg::Update BAG-Data (${date})
         
     - name: Check if there are changes in the repo
       id: changes
@@ -49,5 +49,5 @@ jobs:
         push-branch: master
         name: GitHub Action Scraper
         email: scraper@salzer.it
-        commit-message: 'Update BAG-Data'
+        commit-message: ${{ env.commit_msg }}
         rebase: 'true'
