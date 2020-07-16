@@ -1,14 +1,7 @@
-name: Manually triggered workflow
+name: BAG-Scraper and Parser
 on:
-  workflow_dispatch:
-    inputs:
-      name:
-        description: 'Person to greet'
-        required: true
-        default: 'Mona the Octocat'
-      home:
-        description: 'location'
-        required: false
+  schedule:
+    - cron: '*/5 10-12 * * *'
 
 jobs:
   parse-bag:
