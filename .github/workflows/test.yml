@@ -11,13 +11,23 @@ on:
         required: false
 
 jobs:
-  parse_bag:
+  parse-bag:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Set Node.js 10.x
+      uses: actions/setup-node@master
       with:
-        node-version: '12'
-        check-latest: true
-    - run: npm install
-    - run: npm test
+        version: 10.x
+
+    - name: Install dependencies
+      working-directory: ./script
+      run: |
+        npm install
+
+    - name: Run lint
+      working-directory: ./script
+      run: |
+        npm start
