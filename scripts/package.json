@@ -4,7 +4,7 @@
   "description": "Tool to scrape the BAG-Excel-File",
   "main": "scraper.js download",
   "scripts": {
-    "start": "node scraper.js",
+    "start": "node scraper.js download",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
