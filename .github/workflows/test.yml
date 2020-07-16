@@ -23,11 +23,11 @@ jobs:
         node-version: 10.x
 
     - name: Install dependencies
-      working-directory: /scripts
+      working-directory: scripts
       run: |
         npm install
 
     - name: Run Script
-      working-directory: /scripts
+      working-directory: scripts
       run: |
         npm start
