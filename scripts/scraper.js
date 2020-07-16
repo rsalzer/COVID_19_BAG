@@ -222,47 +222,51 @@ function parseExcel() {
           console.log('\x1b[42m%s\x1b[0m', 'Successfully renamed temp.xlsx - AKA moved!')
         })
 
-        csv()
-        .fromFile('../data/casesPerCanton.csv')
-        .then((jsonObj)=>{
-            //console.log(jsonObj);
-            var lastRow = jsonObj[jsonObj.length-1];
-            var secondLastRow = jsonObj[jsonObj.length-2];
-            var diffs = [];
-            var totalDiff = 0;
-            var diffString = "";
-            for(var i=0; i<cantons.length-1;i++) { //ignore 'FL'
-              var canton = cantons[i];
-              var today = parseInt(lastRow[canton]);
-              var yesterday = parseInt(secondLastRow[canton]);
-              if(today!=yesterday) {
-                var diff = today-yesterday;
-                totalDiff += diff;
-                var singleDiff = {
-                  canton: canton,
-                  diff: diff
-                }
-                diffs.push(singleDiff);
-                var numberString = diff>0 ? "+"+diff : diff+" (correction)";
-                diffString += "\n"+canton+": "+numberString;
-              }
-            }
-            diffString = "#COVID_19 #COVID19 #CoronaInfoCH #Coronavirus\n🇨🇭BAG-Data from today: +"+totalDiff+diffString;
-            diffString += "\nhttps://rsalzer.github.io/COVID_19_CH";
-            console.log(diffString);
-            rl.question("Should I tweet it? (y/n)", function(name) {
-                  if(name=="y") {
-                    console.log("OK, i will tweet");
-                    tweet(diffString);
-                  }
-                  rl.close();
-              });
-          });
+        rl.close();
     });
   }
   else {
     rl.close();
   }
+}
+
+function askToTweet() {
+  csv()
+  .fromFile('../data/casesPerCanton.csv')
+  .then((jsonObj)=>{
+      //console.log(jsonObj);
+      var lastRow = jsonObj[jsonObj.length-1];
+      var secondLastRow = jsonObj[jsonObj.length-2];
+      var diffs = [];
+      var totalDiff = 0;
+      var diffString = "";
+      for(var i=0; i<cantons.length-1;i++) { //ignore 'FL'
+        var canton = cantons[i];
+        var today = parseInt(lastRow[canton]);
+        var yesterday = parseInt(secondLastRow[canton]);
+        if(today!=yesterday) {
+          var diff = today-yesterday;
+          totalDiff += diff;
+          var singleDiff = {
+            canton: canton,
+            diff: diff
+          }
+          diffs.push(singleDiff);
+          var numberString = diff>0 ? "+"+diff : diff+" (correction)";
+          diffString += "\n"+canton+": "+numberString;
+        }
+      }
+      diffString = "#COVID_19 #COVID19 #CoronaInfoCH #Coronavirus\n🇨🇭BAG-Data from today: +"+totalDiff+diffString;
+      diffString += "\nhttps://rsalzer.github.io/COVID_19_CH";
+      console.log(diffString);
+      rl.question("Should I tweet it? (y/n)", function(name) {
+            if(name=="y") {
+              console.log("OK, i will tweet");
+              tweet(diffString);
+            }
+            rl.close();
+        });
+    });
 }
 
 function makeCantonCSVRow(obj) {
