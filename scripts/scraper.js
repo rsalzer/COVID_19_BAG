@@ -28,6 +28,8 @@ const bagExcelLocation = "https://www.bag.admin.ch/dam/bag/de/dokumente/mt/k-und
 const ageLabels = ["0-9","10-19","20-29","30-39","40-49","50-59","60-69","70-79","80+"];
 var appendToFiles = false;
 
+console.log("The Test: " +  process.env.TEST);
+
 var myArgs = process.argv.slice(2);
 switch (myArgs[0]) {
 case 'download':
