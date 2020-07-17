@@ -233,14 +233,13 @@ function parseExcel() {
         console.log("FileDate = "+fileDate);
         console.log("Date of BAG = "+date);
 
-        //console.log('::set-env name=date::'+date);
+        console.log('::set-env name=date::'+date);
 
         if(fileDate==date) {
           console.log('\x1b[41m%s\x1b[0m', "No new data ... doing nothing!");
-          //fs.unlinkSync('temp.xlsx');
-          console.log('::set-env name=date::test');
+          fs.unlinkSync('temp.xlsx');
           console.log('Temp.xlsx deleted!');
-          core.setOutput('newdata', 1);
+          core.setOutput('newdata', 0);
           rl.close();
           return;
         }
