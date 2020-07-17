@@ -81,7 +81,7 @@ function checkIfFileNeedsToBeDownloaded() {
       }
       else {
         console.log("We already got today ... do nothing");
-        core.setFailed("We already got today");
+        core.setOutput('newdata', 0);
         rl.close();
       }
     });
@@ -239,7 +239,7 @@ function parseExcel() {
           console.log('\x1b[41m%s\x1b[0m', "No new data ... doing nothing!");
           fs.unlinkSync('temp.xlsx');
           console.log('Temp.xlsx deleted!');
-          core.setFailed("No new data");
+          core.setOutput('newdata', 0);
           rl.close();
           return;
         }
@@ -260,6 +260,7 @@ function parseExcel() {
         fs.rename(oldPath, newPath, function (err) {
           if (err) throw err
           console.log('\x1b[42m%s\x1b[0m', 'Successfully renamed temp.xlsx - AKA moved!')
+          core.setOutput('newdata', 1);
         })
 
         rl.close();
