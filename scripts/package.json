@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/rsalzer/COVID_19_BAG#readme",
   "dependencies": {
+    "@actions/core": "^1.2.4",
     "convert-excel-to-json": "^1.6.1",
     "csvtojson": "^2.0.10",
     "fs": "0.0.1-security",
