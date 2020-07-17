@@ -21,6 +21,7 @@ jobs:
 
     - name: Run Script
       working-directory: scripts
+      id: parsing
       env:
         CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
         CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
@@ -34,12 +35,8 @@ jobs:
       run: |
         echo ::set-env name=commit_msg::'Update BAG-Data ('${date}')'
         
-    - name: Check if there are changes in the repo
-      id: changes
-      uses: UnicornGlobal/has-changes-action@v1.0.11
-        
     - name: Commit and push to repo
-      if: steps.changes.outputs.changed == 1 # only try to commit if there are actually changes
+      if: steps.parsing.outputs.newdata == 1 # only try to commit if there are actually changes
       uses: github-actions-x/commit@v2.6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
