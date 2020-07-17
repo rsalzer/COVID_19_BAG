@@ -257,13 +257,20 @@ function parseExcel() {
         var oldPath = 'temp.xlsx'
         var newPath = '../bagfiles/'+date+'.xlsx'
 
+        fs.readFile('label.json', (err, data) => {
+            if (err) throw err;
+            let label = JSON.parse(data);
+            console.log(label);
+            label.message = date;
+            fs.writeFileSync('label.json', JSON.stringify(label));
+        });
+
         fs.rename(oldPath, newPath, function (err) {
           if (err) throw err
           console.log('\x1b[42m%s\x1b[0m', 'Successfully renamed temp.xlsx - AKA moved!')
           core.setOutput('newdata', 1);
-        })
-
-        rl.close();
+          rl.close();
+        });
     });
   }
   else {
@@ -300,13 +307,15 @@ function askToTweet() {
       diffString = "#COVID_19 #COVID19 #CoronaInfoCH #Coronavirus\n🇨🇭BAG-Data from today: +"+totalDiff+diffString;
       diffString += "\nhttps://rsalzer.github.io/COVID_19_CH";
       console.log(diffString);
-      rl.question("Should I tweet it? (y/n)", function(name) {
-            if(name=="y") {
-              console.log("OK, i will tweet");
-              tweet(diffString);
-            }
-            rl.close();
-        });
+      tweet(diffString);
+      //rl.close();
+      // rl.question("Should I tweet it? (y/n)", function(name) {
+      //       if(name=="y") {
+      //         console.log("OK, i will tweet");
+      //         tweet(diffString);
+      //       }
+      //       rl.close();
+      //   });
     });
 }
 
