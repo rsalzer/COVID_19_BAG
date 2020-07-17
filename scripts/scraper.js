@@ -239,6 +239,7 @@ function parseExcel() {
           console.log('\x1b[41m%s\x1b[0m', "No new data ... doing nothing!");
           fs.unlinkSync('temp.xlsx');
           console.log('Temp.xlsx deleted!');
+          core.setFailed("No new data");
           rl.close();
           return;
         }
