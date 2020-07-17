@@ -268,6 +268,7 @@ function parseExcel() {
         fs.rename(oldPath, newPath, function (err) {
           if (err) throw err
           console.log('\x1b[42m%s\x1b[0m', 'Successfully renamed temp.xlsx - AKA moved!')
+          tweetNewNumbers();
           core.setOutput('newdata', 1);
           rl.close();
         });
@@ -278,7 +279,7 @@ function parseExcel() {
   }
 }
 
-function askToTweet() {
+function tweetNewNumbers() {
   csv()
   .fromFile('../data/casesPerCanton.csv')
   .then((jsonObj)=>{
