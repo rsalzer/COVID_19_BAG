@@ -292,6 +292,7 @@ function parseExcel() {
           console.log('Temp.xlsx deleted!');
           core.setOutput('newdata', 0);
           rl.close();
+          core.setFailed("No new data ... doing nothing!");
           return;
         }
 
