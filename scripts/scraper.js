@@ -39,6 +39,10 @@ case 'download':
     if(myArgs[1] == "append") {
       appendToFiles = true;
     }
+    if(myArgs[1] == "force") {
+      downloadFile();
+      return;
+    }
     checkIfFileNeedsToBeDownloaded();
     break;
 case 'parse':
@@ -98,6 +102,52 @@ function downloadFile() {
         else rl.close();
       });
   });
+}
+
+function downloadTestcasesFile() {
+  var location = "https://www.bag.admin.ch/dam/bag/de/dokumente/mt/k-und-i/aktuelle-ausbrueche-pandemien/2019-nCoV/covid-19-basisdaten-labortests.xlsx.download.xlsx/Dashboard_3_COVID19_labtests_positivity.xlsx";
+  const file = fs.createWriteStream("temptestcases.xlsx");
+  const request = https.get(location, function(response) {
+      response.pipe(file);
+      file.on('finish', function() {
+        console.log("Finish downloading Testcases");
+        parseTestCasesFile();
+      });
+  });
+}
+
+function parseTestCasesFile() {
+  var result;
+  try {
+     result = excelToJson({
+        sourceFile: 'temptestcases.xlsx'
+    });
+  }
+  catch(e) {
+    console.log('\x1b[41m%s\x1b[0m', "Testcase-File is not an Excel");
+    return;
+  }
+  var dash = result["Dashboard_3"];
+  const dateTimeFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  var csv = "date,pos,neg";
+  for(var i=1; i<dash.length; i++) {
+      var row = dash[i];
+      if(i%2==1) {
+        var csvrow = "\n";
+        const date = row.B.setTime(row.B.getTime()+10800000);
+        const [{ value: month },,{ value: day },,{ value: year }] = dateTimeFormat.formatToParts(date);
+        csvrow += `${year}-${month}-${day},`;
+        csvrow += row.C+",";
+      }
+      else {
+        csvrow += row.C;
+        csv += csvrow;
+      }
+  }
+  console.log('Write tests.csv');
+  fs.writeFileSync('../data/tests.csv', csv);
+  fs.unlinkSync('temptestcases.xlsx');
+  console.log('temptestcases.xlsx deleted!');
 }
 
 function parseExcel() {
@@ -253,6 +303,9 @@ function parseExcel() {
         fs.appendFileSync('../data/casesPerCanton.csv', '\r\n'+cantonRow);
         if(isolationCSV!=null) fs.writeFileSync('../data/current_isolated.csv', isolationCSV);
         console.log("** Done appending **");
+
+        console.log("Download testCases");
+        downloadTestcasesFile();
 
         var oldPath = 'temp.xlsx'
         var newPath = '../bagfiles/'+date+'.xlsx'
