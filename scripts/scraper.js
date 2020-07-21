@@ -86,8 +86,8 @@ function checkIfFileNeedsToBeDownloaded() {
       else {
         console.log("We already got today ... do nothing");
         core.setOutput('newdata', 0);
-        core.setFailed("We already got today ... do nothing");
         rl.close();
+        core.setFailed("We already got today ... do nothing");
       }
     });
 }
