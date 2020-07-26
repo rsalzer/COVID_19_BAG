@@ -323,15 +323,78 @@ function parseExcel() {
         fs.rename(oldPath, newPath, function (err) {
           if (err) throw err
           console.log('\x1b[42m%s\x1b[0m', 'Successfully renamed temp.xlsx - AKA moved!')
+
           tweetNewNumbers();
-          core.setOutput('newdata', 1);
-          rl.close();
+          listFiles();
         });
     });
   }
   else {
     rl.close();
   }
+}
+
+function listFiles() {
+    fs.readdir('../bagfiles', function(err, files) {
+        //handling error
+        if (err) {
+            return console.log('Unable to scan directory: ' + err);
+        }
+        parseCases(files[files.length-1],files[files.length-2]);
+        core.setOutput('newdata', 1);
+        rl.close();
+    });
+}
+
+function parseCases(today, yday) {
+  console.log(today+" / "+yday);
+  //const file = "2020-07-04.xlsx";
+  const result = excelToJson({
+      sourceFile: '../bagfiles/'+today
+  });
+  //const ydayfile = "2020-07-03.xlsx";
+  const yesterday = excelToJson({
+    sourceFile: '../bagfiles/'+yday
+  });
+  var cases = result["COVID19 Zahlen"];
+  var data = cases.splice(5);
+  var ydata = yesterday["COVID19 Zahlen"].splice(5);
+  var csv = "date,new_cases,total_cases,new_hosp,total_hosp,new_deaths,total_deaths,diff";
+  const dateTimeFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  var diff = 0;
+  var diffString = "";
+  for(var i=0; i<data.length; i++) {
+    var singleData = data[i];
+    const date = data[i].A.setTime(data[i].A.getTime()+7200000);
+    const [{ value: month },,{ value: day },,{ value: year }] = dateTimeFormat.formatToParts(date);
+    if(i<data.length-1) {
+      var singleYesterday = ydata[i];
+      var casesYesterday = singleYesterday.B;
+      var casesToday = singleData.B;
+      var singleDiff = 0;
+      if(casesYesterday!=casesToday) {
+        singleDiff = casesToday - casesYesterday;
+        diff += singleDiff;
+        var singleDiffString;
+        if(singleDiff<0) singleDiffString = singleDiff+" (correction)";
+        else singleDiffString = "+"+singleDiff;
+        diffString+=`${day}.${month}.${year}: ${singleDiffString}\n`;
+      }
+    }
+    else {
+      diffString+=`${day}.${month}.${year}: +${singleData.B}`;
+      var singleDiff = singleData.B;
+    }
+    var line = `\n${year}-${month}-${day},${singleData.B},${singleData.C},${singleData.D},${singleData.E},${singleData.F},${singleData.G},${singleDiff}`;
+    line = line.replace(/undefined/g, "0");
+    csv += line;
+  }
+  fs.writeFileSync('../data/totals.csv', csv);
+  console.log("Done writing Totals");
+  //console.log(csv);
+  // diffString = "#COVID_19 #COVID19 #CoronaInfoCH #Coronavirus\n🇨🇭Date-Distribution of BAG-Data from today: +"+(diff+data[data.length-1].B)+"\n"+diffString;
+  // console.log(diffString);
+  //console.log(csv);
 }
 
 function tweetNewNumbers() {
