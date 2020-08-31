@@ -482,7 +482,7 @@ function makeIsolationCSV(array) {
   var csv = "date,abbreviation_canton_and_fl,current_isolated,current_quarantined\n";
   const dateTimeFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: '2-digit' })
   array.forEach((item,i) => {
-    if(item.current_isolated!=undefined) {
+    if(item.current_isolated!=undefined && item.current_isolated.length<9) {
       var csvline = "";
       const [{ value: month },,{ value: day },,{ value: year }] = dateTimeFormat.formatToParts(item.date);
       csvline += `${year}-${month}-${day},`
