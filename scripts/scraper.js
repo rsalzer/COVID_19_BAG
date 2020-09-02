@@ -500,7 +500,10 @@ function makeIsolationCSV(array) {
 function tweet(message) {
     var T = new Twitter(config);
     T.post('statuses/update', {status: message},  function(error, tweet, response) {
-      if(error) throw error;
+      if(error) {
+        console.log("Error while tweeting: "+error);
+        throw error;
+      }
       //console.log(tweet);  // Tweet body.
       console.log("Tweet sent");  // Raw response object.
     });
