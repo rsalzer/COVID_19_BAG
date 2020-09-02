@@ -501,8 +501,8 @@ function tweet(message) {
     var T = new Twitter(config);
     T.post('statuses/update', {status: message},  function(error, tweet, response) {
       if(error) {
-        console.log("Error while tweeting: "+error.message);
-        throw error;
+        console.log("Error while tweeting: "+error[0].message);
+        //throw error;
       }
       //console.log(tweet);  // Tweet body.
       console.log("Tweet sent");  // Raw response object.
