@@ -1,9 +1,10 @@
 date,abbreviation_canton_and_fl,current_isolated,current_quarantined
-2020-09-08,AG,145,332
+2020-09-09,AG,136,292
 2020-09-09,AI,1,1
 2020-09-08,AR,8,98
 2020-09-08,BE,272,714
-2020-09-08,BS,46,67
+2020-09-09,BL,44,94
+2020-09-09,BS,46,83
 2020-09-08,FR,303,617
 2020-09-08,GE,348,759
 2020-09-08,GL,2,3
@@ -20,6 +21,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined
 2020-09-08,TG,17,102
 2020-09-08,TI,22,98
 2020-09-08,UR,3,7
+2020-09-09,VD,0,0
 2020-09-08,VS,71,190
 2020-09-08,ZG,37,45
 2020-09-08,ZH,506,1043
