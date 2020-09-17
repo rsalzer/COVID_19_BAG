@@ -222,7 +222,8 @@ function parseExcel() {
         abbreviation_canton_and_fl: item.A,
         date: item.B,
         current_isolated: item.C,
-        current_quarantined: item.D
+        current_quarantined: item.D,
+        foreign_quarantined: item.E
       });
     }
     });
@@ -479,7 +480,7 @@ function makeCSVRow(array, date) {
 }
 
 function makeIsolationCSV(array) {
-  var csv = "date,abbreviation_canton_and_fl,current_isolated,current_quarantined\n";
+  var csv = "date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_quarantined\n";
   const dateTimeFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: '2-digit' })
   array.forEach((item,i) => {
     if(item.current_isolated!=undefined && item.current_isolated.length<9) {
@@ -490,6 +491,8 @@ function makeIsolationCSV(array) {
       if(item.current_isolated!=undefined) csvline += item.current_isolated;
       csvline += ",";
       if(item.current_quarantined!=undefined) csvline += item.current_quarantined;
+      csvline += ",";
+      if(item.foreign_quarantined!=undefined) csvline += item.foreign_quarantined;
       csvline += "\n";
       csv += csvline;
     }
