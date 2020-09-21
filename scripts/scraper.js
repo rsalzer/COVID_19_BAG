@@ -359,8 +359,8 @@ function parseCases(today, yday) {
   });
   var cases = result["COVID19 Zahlen"];
   var data = cases.splice(5);
-  var ydata = yesterday["COVID19 Zahlen"].splice(5);
-  var csv = "date,new_cases,total_cases,new_hosp,total_hosp,new_deaths,total_deaths,diff";
+  //var ydata = yesterday["COVID19 Zahlen"].splice(5);
+  var csv = "date,new_cases,total_cases,new_hosp,total_hosp,new_deaths,total_deaths";
   const dateTimeFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: '2-digit' })
   var diff = 0;
   var diffString = "";
@@ -368,25 +368,25 @@ function parseCases(today, yday) {
     var singleData = data[i];
     const date = data[i].A.setTime(data[i].A.getTime()+7200000);
     const [{ value: month },,{ value: day },,{ value: year }] = dateTimeFormat.formatToParts(date);
-    if(i<data.length-1) {
-      var singleYesterday = ydata[i];
-      var casesYesterday = singleYesterday.B;
-      var casesToday = singleData.B;
-      var singleDiff = 0;
-      if(casesYesterday!=casesToday) {
-        singleDiff = casesToday - casesYesterday;
-        diff += singleDiff;
-        var singleDiffString;
-        if(singleDiff<0) singleDiffString = singleDiff+" (correction)";
-        else singleDiffString = "+"+singleDiff;
-        diffString+=`${day}.${month}.${year}: ${singleDiffString}\n`;
-      }
-    }
-    else {
-      diffString+=`${day}.${month}.${year}: +${singleData.B}`;
-      var singleDiff = singleData.B;
-    }
-    var line = `\n${year}-${month}-${day},${singleData.B},${singleData.C},${singleData.D},${singleData.E},${singleData.F},${singleData.G},${singleDiff}`;
+    // if(i<data.length-1) {
+    //   var singleYesterday = ydata[i];
+    //   var casesYesterday = singleYesterday.B;
+    //   var casesToday = singleData.B;
+    //   var singleDiff = 0;
+    //   if(casesYesterday!=casesToday) {
+    //     singleDiff = casesToday - casesYesterday;
+    //     diff += singleDiff;
+    //     var singleDiffString;
+    //     if(singleDiff<0) singleDiffString = singleDiff+" (correction)";
+    //     else singleDiffString = "+"+singleDiff;
+    //     diffString+=`${day}.${month}.${year}: ${singleDiffString}\n`;
+    //   }
+    // }
+    // else {
+    //   diffString+=`${day}.${month}.${year}: +${singleData.B}`;
+    //   var singleDiff = singleData.B;
+    // }
+    var line = `\n${year}-${month}-${day},${singleData.B},${singleData.C},${singleData.D},${singleData.E},${singleData.F},${singleData.G}`;
     line = line.replace(/undefined/g, "0");
     csv += line;
   }
