@@ -420,13 +420,16 @@ function tweetNewNumbers() {
             diff: diff
           }
           diffs.push(singleDiff);
-          var numberString = diff>0 ? "+"+diff : diff+" (correction)";
+          var numberString = diff>0 ? ""+diff : diff+" (cr.)";
           diffString += "\n"+canton+": "+numberString;
         }
       }
-      diffString = "#COVID_19 #COVID19 #CoronaInfoCH #Coronavirus\n🇨🇭BAG-Data from today: +"+totalDiff+diffString;
-      diffString += "\nhttps://rsalzer.github.io/COVID_19_CH";
+      diffString = "#COVID19 #CoronaInfoCH\n🇨🇭BAG-Data from today: "+totalDiff+diffString;
+      if(280-diffString.length>=37) {
+        diffString += "\nhttps://rsalzer.github.io/COVID_19_CH";
+      }
       console.log(diffString);
+      console.log("Length of tweet:"+diffString.length);
       tweet(diffString);
       //rl.close();
       // rl.question("Should I tweet it? (y/n)", function(name) {
