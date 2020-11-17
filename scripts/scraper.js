@@ -285,7 +285,7 @@ function parseExcel() {
         console.log("FileDate = "+fileDate);
         console.log("Date of BAG = "+date);
 
-        console.log('::set-env name=date::'+date);
+        core.exportVariable('date', date);
 
         if(fileDate==date) {
           console.log('\x1b[41m%s\x1b[0m', "No new data ... doing nothing!");
