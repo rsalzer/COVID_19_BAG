@@ -35,7 +35,7 @@ jobs:
     - name: Set commit message
       continue-on-error: true
       run: |
-        echo "commit_msg='Update BAG-Data ('${date}')'" >> $GITHUB_ENV
+        echo "commit_msg=Update BAG-Data (${date})" >> $GITHUB_ENV
         
     - name: Commit and push to repo
       if: steps.parsing.outputs.newdata == 1 # only try to commit if there are actually changes
