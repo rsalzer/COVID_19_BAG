@@ -1,8 +1,8 @@
 date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_quarantined
-2020-11-12,AG,1660,0,732
+2020-11-16,AG,2343,0,726
 2020-11-12,AR,320,0,0
 2020-11-12,BL,1479,1081,10
-2020-11-14,BS,968,649,0
+2020-11-16,BS,989,652,32
 2020-11-12,FL,245,312,0
 2020-11-12,GE,4970,5596,104
 2020-11-12,GL,132,304,0
@@ -11,7 +11,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2020-11-12,LU,2200,1300,23
 2020-11-12,NE,1530,320,33
 2020-11-15,NW,112,231,0
-2020-11-12,OW,149,271,0
+2020-11-16,OW,154,305,0
 2020-11-12,SH,354,423,1
 2020-11-12,SO,1323,2302,7
 2020-11-13,SZ,799,0,5
