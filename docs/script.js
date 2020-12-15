@@ -87,11 +87,18 @@ Chart.defaults.global.defaultFontFamily = "IBM Plex Sans";
 
 document.getElementById("loaded").style.display = 'none';
 
-getBAGHospitalData();
+getBAGMetaData();
 //getJSON();
 
-function getBAGHospitalData() {
-  var url = "https://www.covid19.admin.ch/api/data/20201215-rfotj1y8/sources/COVID19HospCapacity_geoRegion.json";
+function getBAGMetaData() {
+  var url = 'https://www.covid19.admin.ch/api/data/context';
+  d3.json(url, function(error, jsondata) {
+    var hospURL = jsondata.sources.individual.json.daily.hospCapacity;
+    getBAGHospitalData(hospURL);
+  });
+}
+
+function getBAGHospitalData(url) {
   d3.json(url, function(error, csvdata) {
       if(error!=null) {
         alert("Daten konnten nicht geladen werden");

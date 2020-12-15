@@ -145,7 +145,7 @@ table tr > :last-child {
 	padding-right: 0;
 }
 table tr:last-child td {
-  font-weight:
+  font-weight: bold;
 }
 table tr td:nth-child(1),
 table tr th:nth-child(1) {
