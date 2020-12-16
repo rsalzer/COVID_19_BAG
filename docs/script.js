@@ -236,6 +236,16 @@ function inDarkMode() {
   return false;
 }
 
+// Create the state-indicator element
+var indicator = document.createElement('div');
+indicator.className = 'state-indicator';
+document.body.appendChild(indicator);
+
+// Create a method which returns device state
+function getDeviceState() {
+    return parseInt(window.getComputedStyle(indicator).getPropertyValue('z-index'), 10);
+}
+
 var app = angular.module('coronach', ['chart.js']);
 
 app.controller('IndexCtrl', ['$scope', function ($scope) {
@@ -321,7 +331,9 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
             }
           },
           ticks: {
-            unit: 'month'
+            unit: 'month',
+            minRotation: (getDeviceState()==2?90:0),
+            maxRotation: 90
             // min: getDateForMode(mode),
             // max: new Date(),
           },
