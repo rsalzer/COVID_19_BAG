@@ -255,8 +255,36 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
 
   $scope.labels = [];
   $scope.series = [];
-  $scope.data = [];
-  $scope.colors = ['#cc0000'];
+  $scope.colors = ['#CCCC00','#CC0000'];
+
+  $scope.datasets = ['_Capacity', '_AllPatients', 'Percent_AllPatients', '_Covid19Patients', 'Percent_Covid19Patients'];
+  $scope.selectedDataset = 'Percent_AllPatients';
+  $scope.showICU = true;
+
+  $scope.strings = {
+    '_Capacity': 'Kapazität',
+    '_AllPatients': 'Patienten',
+    'Percent_AllPatients': 'Auslastung in %',
+    '_Covid19Patients': 'COVID19 Patienten',
+    'Percent_Covid19Patients': 'Auslastung COVID19 Patienten in %'
+  };
+
+
+
+
+  $scope.selectDataset = function(dataset) {
+    $scope.selectedDataset = dataset;
+    $scope.update();
+  }
+
+  $scope.cantons = cantons;
+
+  $scope.selectedCanton = 'CH';
+
+  $scope.selectCanton = function(canton) {
+    $scope.selectedCanton = canton;
+    $scope.update();
+  }
 
   $scope.options = {
     animation: false,
@@ -321,8 +349,6 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
   };
   $scope.datasetOverride = [{
       label: "Auslastung",
-      borderColor: '#CCCC00',
-      backgroundColor: '#CCCC00',
       fill: false,
       cubicInterpolationMode: 'monotone',
       spanGaps: true
@@ -333,7 +359,7 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
     console.log("Update");
     $scope.data = [];
     $scope.datasetOverride = [];
-    var filteredData = data.filter(d => d.geoRegion==="CH");
+    var filteredData = data.filter(d => d.geoRegion===$scope.selectedCanton);
     console.log(filteredData);
     $scope.labels = filteredData.map(d => {
       var dateSplit = d.date.split("-");
@@ -342,15 +368,30 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
       var year = parseInt(dateSplit[0]);
       return new Date(year,month,day);
     });
+    var datasetToUse = ($scope.showICU?'ICU':'Total')+$scope.selectedDataset;
+    var colorToUse = $scope.showICU?'#CC0000':'#CCCC00';
+    $scope.colors = [colorToUse];
+    if($scope.selectedDataset.includes("Percent")) {
+      $scope.options.scales.yAxes[0].ticks.suggestedMax = 100;
+    }
+    else {
+      $scope.options.scales.yAxes[0].ticks.suggestedMax = 0;
+    }
     $scope.datasetOverride = [{
-        label: "Auslastung",
-        borderColor: '#CC0000',
-        backgroundColor: '#CC0000',
+        label: $scope.strings[$scope.selectedDataset],
         fill: false,
         cubicInterpolationMode: 'monotone',
         spanGaps: true
-    }];
-    $scope.data = [filteredData.map(d => d.ICUPercent_AllPatients)];
+    }
+    // ,
+    // {
+    //     label: "ICU",
+    //     fill: false,
+    //     cubicInterpolationMode: 'monotone',
+    //     spanGaps: true
+    // }
+    ];
+    $scope.data = [/*filteredData.map(d => d.Total_Capacity)/*];,*/ filteredData.map(d => d[datasetToUse])];
   }
 
 }]);

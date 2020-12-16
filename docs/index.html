@@ -118,10 +118,25 @@
   			<h2>Verlauf</h2>
       </header>
       <article ng-controller="ChartCtrl" id="interactive">
-        <h3 class="flag CH">Auslastung Intensivstationen</h3>
+        <h3 class="flag {{selectedCanton}}">{{showICU?'Intensivstationen':'Total'}}: {{strings[selectedDataset]}}</h3>
         <div class="canvascontainer">
           <canvas id="angularcanvas" class="chart chart-line angularchart" chart-colors="colors" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride"></canvas>
         </div>
+        <div id="controls">
+          <div class="angulardiv">
+            <span class="chartHeading">Kanton:</span>
+              <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+            <!-- <button class="controlButton" ng-click="showAllCantons()">Alle</button>
+            <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
+          </div>
+          <div class="angulardiv">
+            <button class="internationalButton rightButton" ng-click="showICU=false;update()" ng-class="!showICU?'active':''">Total</button>
+            <button class="internationalButton rightButton" ng-click="showICU=true;update()" ng-class="showICU?'active':''">Intensivstationen</button>
+          </div>
+          <div class="angulardiv">
+            <span class="chartHeading">Datensatz:</span>
+              <button class="internationalButton rightButton" ng-repeat="set in datasets" ng-click="selectDataset(set)" ng-class="selectedDataset==set?'active':''">{{strings[set]}}</button>
+          </div>
       </article>
     </section>
   </main>

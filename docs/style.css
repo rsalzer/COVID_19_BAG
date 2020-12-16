@@ -620,3 +620,13 @@ button {
   min-width: 0px;
   /* max-width: 800px; */
 }
+
+.chartHeading {
+  font-family: "IBM Plex Sans", sans-serif;
+  margin: 1em 1em 0 0;
+  padding: 0.2em 0;
+  color: var(--color-main);
+  background-color: transparent;
+  font-weight: bold;
+  font-size: 11px;
+}
