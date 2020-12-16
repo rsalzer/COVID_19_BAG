@@ -320,10 +320,7 @@ h3 {
 		border-color: #333;
 	}
 }
-canvas {
-  width: 100%;
-	min-width: var(--canvas-minwidth);
-}
+
 .bagcanvas {
   min-width: 800px;
 }
@@ -596,4 +593,30 @@ button {
 
 .icu {
   display: none;
+}
+
+.angulardiv {
+}
+
+/* canvas {
+  width: 100%;
+	min-width: var(--canvas-minwidth);
+} */
+
+.canvascontainer {
+  position: relative;
+  /* background-color: red; */
+  height: 300px;
+  width: 100%;
+}
+
+#controls {
+  display: block;
+}
+
+.angularchart {
+  display: block;
+  width: 100%;
+  min-width: 0px;
+  /* max-width: 800px; */
 }

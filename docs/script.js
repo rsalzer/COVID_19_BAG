@@ -120,6 +120,11 @@ function processData() {
 
 
   processActualData(null, null);
+
+  var angularDiv = document.getElementById("interactive");
+  var scope = angular.element(angularDiv).scope()
+  scope.update();
+  scope.$apply();
   // processActualDeaths(filter);
   // processActualHospitalisation(filter);
   // console.log("End actual");
@@ -185,6 +190,7 @@ function processActualData(mode, chosenDay) {
   for(var i=0; i<cantons.length; i++) {
     let canton = cantons[i];
     let filteredForCanton = todaysData.filter(d => d.geoRegion == canton)[0];
+    if(filteredForCanton==null) return;
     //console.log(filteredForCanton);
     var tr = document.createElement("tr");
     var auslastung = 100-filteredForCanton.TotalPercent_FreeCapacity;
@@ -223,6 +229,12 @@ function processActualData(mode, chosenDay) {
 
 }
 
+function inDarkMode() {
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return true;
+  }
+  return false;
+}
 
 var app = angular.module('coronach', ['chart.js']);
 
@@ -233,137 +245,112 @@ app.controller('IndexCtrl', ['$scope', function ($scope) {
   $scope.updateVisibility = function() {
     for (let el of document.querySelectorAll('.icu')) el.style.display = $scope.showICU?'table-cell':'none';
     for (let el of document.querySelectorAll('.total')) el.style.display = $scope.showTotal?'table-cell':'none';
+    document.getElementById("titleSpan").innerHTML = $scope.showICU?"Intensivstationen":"Spitalbetten";
   };
 
 }]);
 
-//   $scope.showNoCanton = function() {
-//     $scope.visibility.fill(false);
-//     $scope.update();
-//   };
-//
-//   $scope.showAllCantons = function() {
-//     $scope.visibility.fill(true);
-//     $scope.update();
-//   };
-//
-//
-//   $scope.labels = [0,1,2];
-//   $scope.series = ['Series A'];
-//   $scope.data = [10,20,50];
-//   $scope.onClick = function (points, evt) {
-//     console.log(points, evt);
-//   };
-//
-//   $scope.dataset = 'ncumul_conf';
-//
-//   $scope.relative = false;
-//
-//   $scope.setDataset = function(dataset) {
-//     $scope.dataset = dataset;
-//     $scope.update();
-//   }
-//
-//   $scope.options = {
-//     animation: false,
-//     responsive: true,
-//     layout: {
-//         padding: {
-//             right: 20
-//         }
-//     },
-//     legend: {
-//       display: false
-//     },
-//     title: {
-//       display: true,
-//       text: _('Kantone im Vergleich')
-//     },
-//     tooltips: {
-//       mode: 'index',
-//       intersect: false,
-//       caretSize: 0,
-//       bodyFontFamily: 'IBM Plex Mono'
-//     },
-//     elements: {
-//       point: { radius: 0 }
-//     },
-//     scales: getScales(0),
-//     plugins: {
-//       datalabels: {
-//         display: false
-//       }
-//     }
-//   };
-//   $scope.datasetOverride = [{
-//       label: "Kanton1",
-//       borderColor: '#CCCC00',
-//       backgroundColor: '#CCCC00',
-//       fill: false,
-//       cubicInterpolationMode: 'monotone',
-//       spanGaps: true
-//   },
-//   {
-//       label: "Kanton2",
-//       borderColor: '#CC0000',
-//       backgroundColor: '#CC0000',
-//       fill: false,
-//       cubicInterpolationMode: 'monotone',
-//       spanGaps: true
-//   }];
-//
-//   $scope.showHideCanton = function(x) {
-//     $scope.visibility[x] = !$scope.visibility[x];
-//     $scope.update();
-//   };
-//
-//
-//   $scope.startDate = getDateForMode(0);
-//   $scope.endDate = new Date();
-//
-//   $scope.setEndDate = function(year, month, day) {
-//     var date;
-//     if(year==0) date = new Date();
-//     else date = new Date(Date.UTC(year,month,day))
-//     $scope.endDate = date;
-//     $scope.options.scales.xAxes[0].ticks.max = date;
-//     $scope.update();
-//   }
-//
-//   //$scope.colors = [ 'white' ];
-//   $scope.update = function() {
-//     $scope.data = [];
-//     $scope.datasetOverride = [];
-//     var endIndex;
-//     for(i=0; i<cantons.length-1; i++) {
-//       var filter = filterCases(i, 0);
-//       var data = filter['diff_'+$scope.dataset+'_Avg7Days'];
-//       if(i==0) {
-//         console.log(filter);
-//         endIndex = filter.dateLabels.findIndex(d => d.getTime()>$scope.endDate.getTime());
-//         //alert(endIndex);
-//       }
-//       if(endIndex!=-1) {
-//         filter.dateLabels = filter.dateLabels.splice(0,endIndex);
-//         data = data.splice(0,endIndex);
-//       }
-//       $scope.labels = filter.dateLabels;
-//       var singleOverride = {
-//           label: cantons[i],
-//           hidden: !$scope.visibility[i],
-//           // borderColor: '#CC0000',
-//           // backgroundColor: '#CC0000',
-//           fill: false,
-//           cubicInterpolationMode: 'monotone',
-//           spanGaps: true
-//       }
-//       $scope.datasetOverride.push(singleOverride);
-//       if($scope.relative) {
-//         data = data.map(d => d==null?null:Math.round(d / population[cantons[i]] * 10000000)/100);
-//       }
-//       $scope.data.push(data);
-//     }
-//     //console.log($scope.colors);
-//   }
-//
-// }]);
+
+app.controller('ChartCtrl', ['$scope', function ($scope) {
+
+  $scope.labels = [];
+  $scope.series = [];
+  $scope.data = [];
+  $scope.colors = ['#cc0000'];
+
+  $scope.options = {
+    animation: false,
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: {
+        padding: {
+            right: 0
+        }
+    },
+    legend: {
+      display: false
+    },
+    title: {
+      display: false
+    },
+    tooltips: {
+      mode: 'index',
+      intersect: false,
+      caretSize: 0,
+      bodyFontFamily: 'IBM Plex Mono'
+    },
+    elements: {
+      point: { radius: 0 }
+    },
+    scales: {
+      xAxes: [{
+          type: 'time',
+          time: {
+            tooltipFormat: 'ddd DD.MM.YYYY',
+            unit: 'month',
+            displayFormats: {
+              day: 'DD.MM'
+            }
+          },
+          ticks: {
+            unit: 'month'
+            // min: getDateForMode(mode),
+            // max: new Date(),
+          },
+          gridLines: {
+              color: inDarkMode() ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        }],
+        yAxes: [{
+          type: 'linear',
+          position: 'right',
+          ticks: {
+            beginAtZero: true,
+            suggestedMax: 100
+          },
+          gridLines: {
+              color: inDarkMode() ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        }]
+      },
+    plugins: {
+      datalabels: {
+        display: false
+      }
+    }
+  };
+  $scope.datasetOverride = [{
+      label: "Auslastung",
+      borderColor: '#CCCC00',
+      backgroundColor: '#CCCC00',
+      fill: false,
+      cubicInterpolationMode: 'monotone',
+      spanGaps: true
+  }];
+
+  //$scope.colors = [ 'white' ];
+  $scope.update = function() {
+    console.log("Update");
+    $scope.data = [];
+    $scope.datasetOverride = [];
+    var filteredData = data.filter(d => d.geoRegion==="CH");
+    console.log(filteredData);
+    $scope.labels = filteredData.map(d => {
+      var dateSplit = d.date.split("-");
+      var day = parseInt(dateSplit[2]);
+      var month = parseInt(dateSplit[1])-1;
+      var year = parseInt(dateSplit[0]);
+      return new Date(year,month,day);
+    });
+    $scope.datasetOverride = [{
+        label: "Auslastung",
+        borderColor: '#CC0000',
+        backgroundColor: '#CC0000',
+        fill: false,
+        cubicInterpolationMode: 'monotone',
+        spanGaps: true
+    }];
+    $scope.data = [filteredData.map(d => d.ICUPercent_AllPatients)];
+  }
+
+}]);

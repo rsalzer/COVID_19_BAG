@@ -77,11 +77,11 @@
     	  <article id="latest">
 
           <div class="rightButtonDiv">
-            <button class="internationalButton rightButton" ng-click="showTotal=true;showICU=false;updateVisibility()" ng-class="showTotal?'active':''">Alle Patienten</button>
-            <button class="internationalButton rightButton" ng-click="showTotal=false;showICU=true;updateVisibility()" ng-class="showICU?'active':''">ICU Patienten</button>
+            <button class="internationalButton rightButton" ng-click="showTotal=true;showICU=false;updateVisibility()" ng-class="showTotal?'active':''">Spitalbette</button>
+            <button class="internationalButton rightButton" ng-click="showTotal=false;showICU=true;updateVisibility()" ng-class="showICU?'active':''">Intensivstationen</button>
           </div>
           <div>
-            <h3>Auslastung der Spitalbetten (<span id="dateSpan" style="white-space: nowrap"></span>)</h3>
+            <h3>Auslastung der <span id="titleSpan">Spitalbetten</span> (<span id="dateSpan" style="white-space: nowrap"></span>)</h3>
               <table class="wide">
                 <thead>
                   <tr>
@@ -107,11 +107,17 @@
           </div>
 
 
-    <!-- <section id="detail">
+    <section id="detail">
       <header>
-  			<h2>Details</h2>
-	  </header>
-    </section> -->
+  			<h2>Verlauf</h2>
+      </header>
+      <article ng-controller="ChartCtrl" id="interactive">
+        <h3 class="flag CH">Auslastung Intensivstationen</h3>
+        <div class="canvascontainer">
+          <canvas id="angularcanvas" class="chart chart-line angularchart" chart-colors="colors" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride"></canvas>
+        </div>
+      </article>
+    </section>
   </main>
   <footer id="page-footer">
 		<p>
