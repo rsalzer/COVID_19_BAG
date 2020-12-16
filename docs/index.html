@@ -118,7 +118,7 @@
   			<h2>Verlauf</h2>
       </header>
       <article ng-controller="ChartCtrl" id="interactive">
-        <h3 class="flag {{selectedCanton}}">{{showICU?'Intensivstationen':'Total'}}: {{strings[selectedDataset]}}</h3>
+        <h3><span class="flag {{selectedCanton}}">&nbsp;</span>{{showICU?'Intensivstationen':'Total'}}: {{strings[selectedDataset]}}</h3>
         <div class="canvascontainer">
           <canvas id="angularcanvas" class="chart chart-line angularchart" chart-colors="colors" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride"></canvas>
         </div>
@@ -146,7 +146,7 @@
       Feedback, Anregungen, Verbesserungsvorschläge, Erweiterungen bitte auf GitHub oder direkt an <a href="https://twitter.com/rob_salzer">@rob_salzer</a>.<br/>
       Design by <a href="https://twitter.com/superpixel">@superpixel</a><br/>
       <!-- Countryflags by <a href="https://github.com/lipis/flag-icon-css">flag-icon-css</a><br/>-->
-      Diese Seite nutzt Google Analytics. <a href="javascript:gaOptout()">Hier klicken für ein Opt-out</a>
+      Diese Seite nutzt Google Analytics. <a href="javascript:gaOptout()">Opt-out</a>
     </p>
 	</footer>
   <script src="script.js"></script>
