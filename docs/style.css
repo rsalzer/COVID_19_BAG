@@ -4,7 +4,7 @@
     --color-main: #000;
     --color-background: #fff;
     --canvas-minwidth: 2700px;
-    --maxwidth: 700px;
+    --maxwidth: 500px;
 }
 @media (prefers-color-scheme: dark) {
     :root {
@@ -427,15 +427,7 @@ button {
 .rightButtonDiv button:last-child {
   margin: 1em 0em 1em 0;
 }
-.internationalButton:hover {
-	border-bottom: 2px solid #000;
-	border-color: var(--color-main);
-}
-.internationalButton:focus {
-    outline: none;
-}
 .internationalButton.active {
-	cursor: default;
 	border-bottom: 2px solid #000;
 	border-color: var(--color-main);
 }
@@ -600,4 +592,8 @@ button {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.icu {
+  display: none;
 }
