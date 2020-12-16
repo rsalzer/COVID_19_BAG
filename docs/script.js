@@ -105,7 +105,7 @@ function getBAGHospitalData(url) {
         alert("Daten konnten nicht geladen werden");
       }
       else {
-        data = csvdata;
+        data = csvdata.filter(d => d.type_variant=="fp7d");
         //alert("Data loaded");
         processData();
       }
