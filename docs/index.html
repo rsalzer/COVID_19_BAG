@@ -21,15 +21,21 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <!-- script async src="https://www.googletagmanager.com/gtag/js?id=UA-160625595-2"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8165RHRWS"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'UA-160625595-2');
-    </script -->
-    <script>
-      var gaProperty = 'G-W8165RHRWS';
+
+      gtag('config', 'G-W8165RHRWS');
+
+      function gaOptout() {
+          document.cookie = 'ga-opt-out=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+          alert('Das Tracking ist jetzt deaktiviert');
+      }
+    </script>
+    <!-- <script>
+      var gaProperty = '256443055';
       var disableStr = 'ga-disable-' + gaProperty;
       if (document.cookie.indexOf(disableStr + '=true') > -1) {
           window[disableStr] = true;
@@ -44,10 +50,10 @@
           m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-      ga('create', 'G-W8165RHRWS', 'auto');
+      ga('create', '256443055', 'auto');
       ga('set', 'anonymizeIp', true);
       ga('send', 'pageview');
-    </script>
+    </script> -->
   </head>
   <body ng-app="coronach">
     <a name="top"></a>
