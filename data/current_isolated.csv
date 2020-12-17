@@ -1,4 +1,5 @@
 date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_quarantined
+2020-12-16,AG,2000,0,28
 2020-12-15,AI,48,58,0
 2020-12-15,AR,219,0,0
 2020-12-15,BE,4571,0,90
@@ -18,4 +19,5 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2020-12-15,UR,163,311,0
 2020-12-15,VD,2734,3590,25
 2020-12-15,VS,1019,0,0
+2020-12-16,ZG,318,604,2
 2020-12-15,ZH,6516,1540,37
