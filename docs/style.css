@@ -31,6 +31,7 @@ body {
 	padding-right: 5vw;
 	padding-top: 1em;
 	max-width: var(--maxwidth);
+  font-size: 0.8em;
 }
 #page-nav ul {
 	list-style: none;
