@@ -74,13 +74,13 @@
 			</div>
 
 		</header>
-    <section id="index" ng-controller="IndexCtrl" >
+    <section id="index">
 			<header>
 				<h2>Übersicht</h2>
 			</header>
       <div id="loadingspinner">Lade Daten...<br/><div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
       <div id="loaded">
-    	  <article id="latest">
+    	  <article id="latest" ng-controller="IndexCtrl" >
 
           <div class="rightButtonDiv">
             <button class="internationalButton rightButton" ng-click="showTotal=true;showICU=false;updateVisibility()" ng-class="showTotal?'active':''">Spitalbetten</button>
@@ -111,14 +111,14 @@
               </table>
             </article>
 
-            <article id="latestR">
+            <article id="latestR" ng-controller="RCtrl">
                   <h3>Reproduktionszahl R (<span id="dateSpanR" style="white-space: nowrap"></span>)</h3>
                   <div class="table-group">
                   <table>
                     <thead>
                       <tr>
-                        <th><span>Kanton</span></th>
-                        <th class="total"><span>R-Wert</span></th>
+                        <th class="pointer" ng-click="sortByRank=false;update()" ng-class="sortByRank?'':'active'"><span>Kanton</span></th>
+                        <th class="pointer" ng-click="sortByRank=true;update()"  ng-class="sortByRank?'active':''"><span>R-Wert</span></th>
                       </tr>
                     </thead>
                     <tbody id="rtabelle1">
@@ -127,7 +127,7 @@
                       <thead>
                         <tr>
                           <th><span>Kanton</span></th>
-                          <th class="total"><span>R-Wert</span></th>
+                          <th><span>R-Wert</span></th>
                         </tr>
                       </thead>
                       <tbody id="rtabelle2">

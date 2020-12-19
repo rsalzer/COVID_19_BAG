@@ -122,7 +122,7 @@ function getBAGRData(url) {
       else {
         rdata = csvdata;
         //alert("Data loaded");
-        processRData();
+        processRData(true);
       }
   });
 }
@@ -220,25 +220,26 @@ function processActualData(mode, chosenDay) {
 
 }
 
-function processRData() {
+function processRData(sort) {
   let nonEmptyData = rdata.filter(d => d.geoRegion=="ZH" && d.median_R_mean!="NA");
   let latestDay = nonEmptyData[nonEmptyData.length-1].date;
-  console.log(nonEmptyData);
+  //console.log(nonEmptyData);
   var dateSpan = document.getElementById("dateSpanR");
   dateSpan.innerHTML = latestDay;
-  let todaysData = rdata.filter(d => d.date == latestDay);
-  //console.log(todaysData);
+  let todaysData = rdata.filter(d => d.date == latestDay && d.geoRegion.length<3 && d.geoRegion!="CH");
+  if(sort) todaysData = todaysData.sort(function(a, b){return b.median_R_mean-a.median_R_mean});
+  console.log(todaysData);
   let firstTable = document.getElementById("rtabelle1");
   let secondTable = document.getElementById("rtabelle2");
-  cantons[cantons.length-1] = 'CH';
-  for(var i=0; i<cantons.length; i++) {
-    let canton = cantons[i];
-    let table;
-    if(i<(cantons.length-1)/2) table = firstTable;
+  firstTable.innerHTML = "";
+  secondTable.innerHTML = "";
+  let table;
+  for(var i=0; i<todaysData.length; i++) {
+    let filteredForCanton = todaysData[i];
+    if(i<todaysData.length/2) table = firstTable;
     else table = secondTable;
-    let filteredForCanton = todaysData.filter(d => d.geoRegion == canton)[0];
-    if(filteredForCanton==null) return;
-    console.log(filteredForCanton);
+    let canton = filteredForCanton.geoRegion;
+    //console.log(filteredForCanton);
     var tr = document.createElement("tr");
     tr.innerHTML = `
       <td><a class='flag ${canton}' href='#detail_${canton}'>${canton}</a></td>
@@ -247,6 +248,15 @@ function processRData() {
 
     table.appendChild(tr);
   }
+  let todayCH = rdata.filter(d => d.date == latestDay && d.geoRegion=="CH")[0];
+  let canton = "CH";
+  var tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><a class='flag ${canton}' href='#detail_${canton}'>${canton}</a></td>
+    <td class="total">${todayCH.median_R_mean}</td>
+  `;
+  table.appendChild(tr);
+
 }
 
 function inDarkMode() {
@@ -276,6 +286,16 @@ app.controller('IndexCtrl', ['$scope', function ($scope) {
     for (let el of document.querySelectorAll('.icu')) el.style.display = $scope.showICU?'table-cell':'none';
     for (let el of document.querySelectorAll('.total')) el.style.display = $scope.showTotal?'table-cell':'none';
     document.getElementById("titleSpan").innerHTML = $scope.showICU?"Intensivstationen":"Spitalbetten";
+  };
+
+}]);
+
+app.controller('RCtrl', ['$scope', function ($scope) {
+
+  $scope.sortByRank = true;
+
+  $scope.update = function() {
+    processRData($scope.sortByRank);
   };
 
 }]);
