@@ -62,12 +62,12 @@
         <li><a title="Zürich" href="https://rsalzer.github.io/COVID_19_KT_ZH">Zürich</a></li>
   			<li><a href="https://rsalzer.github.io/COVID_19_CH">Schweiz</a></li>
   			<li><a title="Visualisierung der Altersdaten" href="https://rsalzer.github.io/COVID_19_AGE">Nach Alter</a></li>
-        <li class="here"><a href="#">Spitalauslastung</a></li>
+        <li class="here"><a href="#">Spitalauslastung / R</a></li>
   		</ul>
 	  </nav>
     <main>
 		<header id="page-header">
-			<h1>Spitalauslastung Schweiz</h1>
+			<h1>Spitalauslastung / R-Wert</h1>
 			<p>Daten bereitgestellt durch das Bundesamt für Gesundheit (BAG).<br>Aufbereitet durch <a href="https://twitter.com/rob_salzer">@rob_salzer</a>. <br/>Wenn Dir die Seite gefällt, <a href='https://rsalzer.github.io/simple-qrbill/coffee.html'>spendier mir einen Kaffee</a>.
 			<div class="notes">
 				<p></p>
@@ -110,7 +110,42 @@
                 </tbody>
               </table>
             </article>
-          </div>
+
+            <article id="latestR">
+                  <h3>Reproduktionszahl R (<span id="dateSpanR" style="white-space: nowrap"></span>)</h3>
+                  <div class="table-group">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th><span>Kanton</span></th>
+                        <th class="total"><span>R-Wert</span></th>
+                        <th
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="rtabelle1">
+                    </tbody>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th><span>Kanton</span></th>
+                          <th class="total"><span>R-Wert</span></th>
+                          <th
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody id="rtabelle2">
+                      </tbody>
+                  </table>
+                </div>
+                <p class="notes">
+                  Die effektive Reproduktionszahl Re gibt an, wie viele Personen eine infizierte Person im Durchschnitt ansteckt. Ist diese Zahl kleiner als 1 ist die Gesamtheit aller angesteckten Personen abnehmend. Ist die Zahl Grösser als 1 nimmt die Summe aller angesteckten Personen zu.
+                  <br/><br/>
+                  Der aktuell berechnete Re-Wert bildet die Infektionslage für die Schweiz von vor circa 10 Tagen ab. Für die Infektionslage gibt es zeitliche Verzögerungen von rund 14 Tagen. Diese zeitlichen Verzögerungen entstehen wegen der zeitlichen Differenz zwischen Ansteckung und positivem Testergebnis.
+                  <br/>
+                  Die Schätzungen der letzten Tage können leicht schwanken. Diese Schwankungen treten besonders in kleinen Regionen, bei sich ändernder Dynamik der Ansteckungslage und bei niederen Fallzahlen auf.
+                </div>
+                </article>
 
 
     <section id="detail">
@@ -118,7 +153,7 @@
   			<h2>Verlauf</h2>
       </header>
       <article ng-controller="ChartCtrl" id="interactive">
-        <h3><span class="flag {{selectedCanton}}">&nbsp;</span>{{showICU?'Intensivstationen':'Total'}}: {{strings[selectedDataset]}}</h3>
+        <h3><span class="flag {{selectedCanton}}">&nbsp;</span>{{showR?'Reproduktionszahl':(showICU?'Intensivstationen:':'Total:')}} {{!showR?strings[selectedDataset]:''}}</h3>
         <div class="canvascontainer">
           <canvas id="angularcanvas" class="chart chart-line angularchart" chart-colors="colors" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride"></canvas>
         </div>
@@ -130,8 +165,9 @@
             <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
           </div>
           <div class="angulardiv">
-            <button class="internationalButton rightButton" ng-click="showICU=false;update()" ng-class="!showICU?'active':''">Total</button>
-            <button class="internationalButton rightButton" ng-click="showICU=true;update()" ng-class="showICU?'active':''">Intensivstationen</button>
+            <button class="internationalButton rightButton" ng-click="showICU=false;showR=false;update()" ng-class="(!showR && !showICU)?'active':''">Total</button>
+            <button class="internationalButton rightButton" ng-click="showICU=true;showR=false;update()" ng-class="(!showR && showICU)?'active':''">Intensivstationen</button>
+            <button class="internationalButton rightButton" ng-click="showR=true;update()" ng-class="showR?'active':''">R-Wert</button>
           </div>
           <div class="angulardiv">
             <span class="chartHeading">Datensatz:</span>

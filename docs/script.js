@@ -95,7 +95,9 @@ function getBAGMetaData() {
   d3.json(url, function(error, jsondata) {
     var hospURL = jsondata.sources.individual.csv.daily.hospCapacity;
     hospURL = hospURL.replace(".json", ".csv");
+    var rURL = jsondata.sources.individual.csv.daily.re;
     getBAGHospitalData(hospURL);
+    getBAGRData(rURL);
   });
 }
 
@@ -108,6 +110,19 @@ function getBAGHospitalData(url) {
         data = csvdata.filter(d => d.type_variant=="fp7d");
         //alert("Data loaded");
         processData();
+      }
+  });
+}
+
+function getBAGRData(url) {
+  d3.csv(url, function(error, csvdata) {
+      if(error!=null) {
+        alert("Daten konnten nicht geladen werden");
+      }
+      else {
+        rdata = csvdata;
+        //alert("Data loaded");
+        processRData();
       }
   });
 }
@@ -156,32 +171,8 @@ var activeMode = "ncumul_conf";
 var activeDay = 0; //0 = today; -1 = yesterday; -2 = two days ago;
 function processActualData(mode, chosenDay) {
   let latestDay = data[data.length-1].date;
-  // if(mode==null) mode = activeMode;
-  // if(chosenDay==null) chosenDay = activeDay;
-  // if(chosenDay>0) chosenDay = 0;
-  // if(mainData.days.length-1+chosenDay<0) chosenDay = -(mainData.days.length-1);
-  // activeMode = mode;
-  // activeDay = chosenDay;
-  // //Highlight chosen Mode
-  // var selectedHead = document.getElementById("head_"+mode);
-  // selectedHead.classList.add("active");
-  // getSiblings(selectedHead, "th.active").forEach(element => element.classList.remove('active'));
-  //
-  // //Highlight chosen Day
-  // var selectedDayHead = document.getElementById("day_"+chosenDay);
-  // if(selectedDayHead==null) selectedDayHead = document.getElementById("day_other");
-  // else selectedDayHead.classList.add("active");
-  // getSiblings(selectedDayHead, "button.active").forEach(element => element.classList.remove('active'));
-  //
-  // var todaysObject = mainData.days[mainData.days.length-1+chosenDay];
-  // var todaysData = todaysObject.data;
   var dateSpan = document.getElementById("dateSpan");
   dateSpan.innerHTML = latestDay;
-  //var sortedActual = Array.from(actualData).sort(function(a, b){return b.ncumul_conf-a.ncumul_conf});
-
-  // var timeNow = new Date();
-  // timeNow.setMinutes(timeNow.getMinutes()-timeNow.getTimezoneOffset()); //correct offset to UTC
-  // timeNow.setHours(timeNow.getHours()-7); //show old date till 7am
   let todaysData = data.filter(d => d.date == latestDay);
   console.log(todaysData);
   let table = document.getElementById("auslastungstable");
@@ -229,6 +220,35 @@ function processActualData(mode, chosenDay) {
 
 }
 
+function processRData() {
+  let nonEmptyData = rdata.filter(d => d.geoRegion=="ZH" && d.median_R_mean!="NA");
+  let latestDay = nonEmptyData[nonEmptyData.length-1].date;
+  console.log(nonEmptyData);
+  var dateSpan = document.getElementById("dateSpanR");
+  dateSpan.innerHTML = latestDay;
+  let todaysData = rdata.filter(d => d.date == latestDay);
+  //console.log(todaysData);
+  let firstTable = document.getElementById("rtabelle1");
+  let secondTable = document.getElementById("rtabelle2");
+  cantons[cantons.length-1] = 'CH';
+  for(var i=0; i<cantons.length; i++) {
+    let canton = cantons[i];
+    let table;
+    if(i<(cantons.length-1)/2) table = firstTable;
+    else table = secondTable;
+    let filteredForCanton = todaysData.filter(d => d.geoRegion == canton)[0];
+    if(filteredForCanton==null) return;
+    console.log(filteredForCanton);
+    var tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><a class='flag ${canton}' href='#detail_${canton}'>${canton}</a></td>
+      <td class="total">${filteredForCanton.median_R_mean}</td>
+    `;
+
+    table.appendChild(tr);
+  }
+}
+
 function inDarkMode() {
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     return true;
@@ -270,6 +290,7 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
   $scope.datasets = ['_Capacity', '_AllPatients', 'Percent_AllPatients', '_Covid19Patients', 'Percent_Covid19Patients'];
   $scope.selectedDataset = 'Percent_AllPatients';
   $scope.showICU = true;
+  $scope.showR = false;
 
   $scope.strings = {
     '_Capacity': 'Kapazität',
@@ -368,11 +389,13 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
 
   //$scope.colors = [ 'white' ];
   $scope.update = function() {
-    console.log("Update");
+    //console.log("Update");
     $scope.data = [];
     $scope.datasetOverride = [];
-    var filteredData = data.filter(d => d.geoRegion===$scope.selectedCanton);
-    console.log(filteredData);
+    var dataToUse = data;
+    if($scope.showR) dataToUse = rdata;
+    var filteredData = dataToUse.filter(d => d.geoRegion===$scope.selectedCanton);
+    //console.log(filteredData);
     $scope.labels = filteredData.map(d => {
       var dateSplit = d.date.split("-");
       var day = parseInt(dateSplit[2]);
@@ -381,16 +404,20 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
       return new Date(year,month,day);
     });
     var datasetToUse = ($scope.showICU?'ICU':'Total')+$scope.selectedDataset;
+    if($scope.showR) datasetToUse = 'median_R_mean';
     var colorToUse = $scope.showICU?'#CC0000':'#CCCC00';
     $scope.colors = [colorToUse];
-    if($scope.selectedDataset.includes("Percent")) {
+    if($scope.showR) {
+      $scope.options.scales.yAxes[0].ticks.suggestedMax = 2;
+    }
+    else if($scope.selectedDataset.includes("Percent")) {
       $scope.options.scales.yAxes[0].ticks.suggestedMax = 100;
     }
     else {
       $scope.options.scales.yAxes[0].ticks.suggestedMax = 0;
     }
     $scope.datasetOverride = [{
-        label: $scope.strings[$scope.selectedDataset],
+        label: $scope.showR?'R-Wert':$scope.strings[$scope.selectedDataset],
         fill: false,
         cubicInterpolationMode: 'monotone',
         spanGaps: true
@@ -403,6 +430,7 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
     //     spanGaps: true
     // }
     ];
+
     $scope.data = [/*filteredData.map(d => d.Total_Capacity)/*];,*/ filteredData.map(d => d[datasetToUse])];
   }
 
