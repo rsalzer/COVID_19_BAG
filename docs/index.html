@@ -169,6 +169,12 @@
             <span class="chartHeading">Datensatz:</span>
               <button class="internationalButton rightButton" ng-repeat="set in datasets" ng-click="selectDataset(set)" ng-class="selectedDataset==set?'active':''">{{strings[set]}}</button>
           </div>
+          <div class="angulardiv">
+            <span class="chartHeading">Ausschnitt:</span>
+            <button class="internationalButton rightButton" ng-click="duration=0;update()" ng-class="duration==0?'active':''">Gesamt</button>
+            <button class="internationalButton rightButton" ng-click="duration=93;update()" ng-class="duration==93?'active':''">Letzte 3 Monate</button>
+            <button class="internationalButton rightButton" ng-click="duration=31;update()" ng-class="duration==31?'active':''">Letzter Monat</button>
+          </div>
       </article>
     </section>
   </main>

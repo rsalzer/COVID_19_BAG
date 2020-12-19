@@ -306,12 +306,7 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
   $scope.labels = [];
   $scope.series = [];
   $scope.colors = ['#CCCC00','#CC0000'];
-
-  $scope.datasets = ['_Capacity', '_AllPatients', 'Percent_AllPatients', '_Covid19Patients', 'Percent_Covid19Patients'];
-  $scope.selectedDataset = 'Percent_AllPatients';
-  $scope.showICU = true;
-  $scope.showR = false;
-
+  $scope.cantons = cantons;
   $scope.strings = {
     '_Capacity': 'Kapazität',
     '_AllPatients': 'Patienten',
@@ -320,17 +315,17 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
     'Percent_Covid19Patients': 'Auslastung COVID19 Patienten in %'
   };
 
-
-
+  $scope.datasets = ['_Capacity', '_AllPatients', 'Percent_AllPatients', '_Covid19Patients', 'Percent_Covid19Patients'];
+  $scope.selectedDataset = 'Percent_AllPatients';
+  $scope.showICU = true;
+  $scope.showR = false;
+  $scope.selectedCanton = 'CH';
+  $scope.duration = 0;
 
   $scope.selectDataset = function(dataset) {
     $scope.selectedDataset = dataset;
     $scope.update();
   }
-
-  $scope.cantons = cantons;
-
-  $scope.selectedCanton = 'CH';
 
   $scope.selectCanton = function(canton) {
     $scope.selectedCanton = canton;
@@ -372,7 +367,6 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
             }
           },
           ticks: {
-            unit: 'month',
             minRotation: (getDeviceState()==2?90:0),
             maxRotation: 90
             // min: getDateForMode(mode),
@@ -414,8 +408,13 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
     $scope.datasetOverride = [];
     var dataToUse = data;
     if($scope.showR) dataToUse = rdata;
-    var filteredData = dataToUse.filter(d => d.geoRegion===$scope.selectedCanton);
-    //console.log(filteredData);
+    let filteredData = dataToUse.filter(d => d.geoRegion===$scope.selectedCanton);
+    if($scope.showR) filteredData = filteredData.filter(d => d.median_R_mean!="NA");
+    if($scope.duration!=0) {
+      filteredData.splice(0, filteredData.length-$scope.duration);
+      $scope.options.scales.xAxes[0].time.unit = 'day';
+    }
+    else $scope.options.scales.xAxes[0].time.unit = 'month';
     $scope.labels = filteredData.map(d => {
       var dateSplit = d.date.split("-");
       var day = parseInt(dateSplit[2]);
@@ -425,7 +424,7 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
     });
     var datasetToUse = ($scope.showICU?'ICU':'Total')+$scope.selectedDataset;
     if($scope.showR) datasetToUse = 'median_R_mean';
-    var colorToUse = $scope.showICU?'#CC0000':'#CCCC00';
+    var colorToUse = ($scope.showICU||$scope.showR)?'#CC0000':'#CCCC00';
     $scope.colors = [colorToUse];
     if($scope.showR) {
       $scope.options.scales.yAxes[0].ticks.suggestedMax = 2;
