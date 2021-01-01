@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="no-js" lang="de">
+  <head>
+    <meta charset="utf-8">
+    <title>BAG-Daten Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Visualisierung der BAG-Daten.">
+    <meta name="keywords" content="Corona,COVID-19,daten,cases,Fälle,Schweiz,Covid,deaths,hospitalisation">
+    <meta name="twitter:card" value="summary">
+    <meta name="twitter:creator" content="@rob_salzer">
+    <meta property="og:title" content="BAG-Daten Details">
+    <meta property="og:url" content="https://rsalzer.github.io/COVID_19_BAG/pro">
+    <meta property="og:description" content="Visualisierung der Corona-Fälle in der Schweiz, basierend auf den Daten des BAG.">
+    <!-- <meta property="og:image" content="https://rsalzer.github.io/COVID_19_CH/preview2.jpg"> -->
+    <!--meta property="og:image" content="https://rsalzer.github.io/COVID_19_CH/preview2.png" -->
+    <script src="../js/d3.v3.js"></script>
+    <script src="../js/Chart.bundle.min.js"></script>
+    <script src="../js/chartjs-plugin-datalabels.min.js"></script>
+    <script src="../js/angular.min.js"></script>
+    <script src="../js/angular-chart.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../style.css">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8165RHRWS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-W8165RHRWS');
+
+      function gaOptout() {
+          document.cookie = 'ga-opt-out=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+          alert('Das Tracking ist jetzt deaktiviert');
+      }
+    </script> -->
+    <!-- <script>
+      var gaProperty = '256443055';
+      var disableStr = 'ga-disable-' + gaProperty;
+      if (document.cookie.indexOf(disableStr + '=true') > -1) {
+          window[disableStr] = true;
+      }
+      function gaOptout() {
+          document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+          window[disableStr] = true;
+          alert(_('Das Tracking ist jetzt deaktiviert'));
+      }
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', '256443055', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script> -->
+  </head>
+  <body ng-app="coronach">
+    <a name="top"></a>
+    <nav id="page-nav">
+  		<ul>
+        <li><a title="Zürich" href="https://rsalzer.github.io/COVID_19_KT_ZH">Zürich</a></li>
+  			<li><a href="https://rsalzer.github.io/COVID_19_CH">Schweiz</a></li>
+  			<li><a title="Visualisierung der Altersdaten" href="https://rsalzer.github.io/COVID_19_AGE">Nach Alter</a></li>
+        <li class="here"><a href="#">Spitalauslastung / R</a></li>
+  		</ul>
+	  </nav>
+    <main>
+		<header id="page-header">
+			<h1>BAG-Daten im Verlauf</h1>
+			<p>Daten bereitgestellt durch das Bundesamt für Gesundheit (BAG).<br>Aufbereitet durch <a href="https://twitter.com/rob_salzer">@rob_salzer</a>. <br/>Wenn Dir die Seite gefällt, <a href='https://rsalzer.github.io/simple-qrbill/coffee.html'>spendier mir einen Kaffee</a>.
+			<div class="notes">
+				<p></p>
+			</div>
+		</header>
+
+    <div id="loadingspinner">Lade Daten...<br/><div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
+    <div id="loaded"></div>
+
+    <section id="detail">
+      <header>
+  			<h2>Verlauf</h2>
+      </header>
+      <article ng-controller="ChartCtrl" id="interactive">
+        <!-- <h3><span class="flag {{selectedCanton}}">&nbsp;</span>{{showR?'Reproduktionszahl':(showICU?'Intensivstationen:':'Total:')}} {{!showR?strings[selectedDataset]:''}}</h3> -->
+        <div class="canvascontainer">
+          <canvas id="angularcanvas" class="chart chart-line angularchart" chart-colors="colors" chart-data="data" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride"></canvas>
+          <!-- chart-labels="labels" -->
+        </div>
+        <div id="controls">
+          <div class="angulardiv">
+            <span class="chartHeading">Ausschnitt:</span>
+            <button class="internationalButton rightButton" ng-click="duration=0;update()" ng-class="duration==0?'active':''">Gesamt</button>
+            <button class="internationalButton rightButton" ng-click="duration=93;update()" ng-class="duration==93?'active':''">Letzte 3 Monate</button>
+            <button class="internationalButton rightButton" ng-click="duration=31;update()" ng-class="duration==31?'active':''">Letzter Monat</button>
+          </div>
+          <div class="angulardiv">
+            <span class="chartHeading">Absolut/Relativ:</span>
+            <button class="internationalButton rightButton" ng-click="showAbsolute=true;update()" ng-class="showAbsolute?'active':''">Absolut</button>
+            <button class="internationalButton rightButton" ng-click="showAbsolute=false;update()" ng-class="!showAbsolute?'active':''">Pro 100'000 Einwohner</button>
+          </div>
+          <div class="angulardiv">
+            <span class="chartHeading">Charts:</span>
+              <button class="internationalButton rightButton" ng-repeat="chart in charts" ng-click="selectChart($index);" ng-class="index==$index?'active':''">{{strings[chart.selectedDataset]}}-{{chart.canton}}</button>
+              <!-- ng-style="{'background-color':chart.color}" -->
+          </div>
+          <div class="angulardiv">
+            <span class="chartHeading">Kanton:</span>
+              <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+            <!-- <button class="controlButton" ng-click="showAllCantons()">Alle</button>
+            <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
+          </div>
+          <div class="angulardiv">
+            <span class="chartHeading">Datensatz:</span>
+              <button class="internationalButton rightButton" ng-repeat="set in datasets" ng-click="selectDataset(set)" ng-class="selectedDataset==set?'active':''">{{strings[set]}}</button>
+          </div>
+          <div class="angulardiv">
+            <span class="chartHeading">Farbe:</span>
+              <button class="internationalButton rightButton colorButton" ng-style="{'background-color':color}" ng-repeat="color in availableColors" ng-click="selectColor(color)" ng-class="selectedColor==color?'active':''">&nbsp;&nbsp;&nbsp;&nbsp;</button>
+          </div>
+          <div class="angulardiv">
+            <button class="internationalButton rightButton" ng-click="addChart()">Add Chart</button>
+            <button class="internationalButton rightButton" ng-click="deleteChart()">Delete Chart</button>
+          </div>
+
+      </article>
+    </section>
+  </main>
+  <footer id="page-footer">
+		<p>
+      Code auf <a href="https://github.com/rsalzer/COVID_19_BAG/docs">GitHub</a>.<br/>
+      Feedback, Anregungen, Verbesserungsvorschläge, Erweiterungen bitte auf GitHub oder direkt an <a href="https://twitter.com/rob_salzer">@rob_salzer</a>.<br/>
+      Design by <a href="https://twitter.com/superpixel">@superpixel</a><br/>
+      <!-- Countryflags by <a href="https://github.com/lipis/flag-icon-css">flag-icon-css</a><br/>-->
+      Diese Seite nutzt Google Analytics. <a href="javascript:gaOptout()">Opt-out</a>
+    </p>
+	</footer>
+  <script src="script.js"></script>
+  </body>
+</html>
