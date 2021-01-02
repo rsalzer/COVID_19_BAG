@@ -68,7 +68,7 @@
     <main>
 		<header id="page-header">
 			<h1>BAG-Daten im Verlauf</h1>
-			<p>Daten bereitgestellt durch das Bundesamt für Gesundheit (BAG).<br>Aufbereitet durch <a href="https://twitter.com/rob_salzer">@rob_salzer</a>. <br/>Wenn Dir die Seite gefällt, <a href='https://rsalzer.github.io/simple-qrbill/coffee.html'>spendier mir einen Kaffee</a>.
+			<p>Daten bereitgestellt durch das Bundesamt für Gesundheit (BAG).<br>Alle Daten sind 7-Tages-Durchschnitte.<br><br>Aufbereitet durch <a href="https://twitter.com/rob_salzer">@rob_salzer</a>. <br/>Wenn Dir die Seite gefällt, <a href='https://rsalzer.github.io/simple-qrbill/coffee.html'>spendier mir einen Kaffee</a>.
 			<div class="notes">
 				<p></p>
 			</div>
@@ -100,27 +100,38 @@
             <button class="internationalButton rightButton" ng-click="showAbsolute=false;update()" ng-class="!showAbsolute?'active':''">Pro 100'000 Einwohner</button>
           </div>
           <div class="angulardiv">
+            <span class="chartHeading">ySkala:</span>
+            <button class="internationalButton rightButton" ng-click="singleScale=false;update()" ng-class="!singleScale?'active':''">Mehrere Skalas</button>
+            <button class="internationalButton rightButton" ng-click="singleScale=true;update()" ng-class="singleScale?'active':''">Eine Skala</button>
+          </div>
+          <div class="angulardiv">
             <span class="chartHeading">Charts:</span>
-              <button class="internationalButton rightButton" ng-repeat="chart in charts" ng-click="selectChart($index);" ng-class="index==$index?'active':''">{{strings[chart.selectedDataset]}}-{{chart.canton}}</button>
+              <span ng-repeat="chart in charts">
+                <button class="internationalButton rightButton" ng-click="deleteChart($index)" ng-class="index==$index?'active':''" ng-style="{'border-color': chart.color}">{{strings[chart.selectedDataset]}}-{{chart.canton}}<span style="color: #FF0000"> X</span></button>
+              </span>
               <!-- ng-style="{'background-color':chart.color}" -->
           </div>
-          <div class="angulardiv">
-            <span class="chartHeading">Kanton:</span>
-              <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
-            <!-- <button class="controlButton" ng-click="showAllCantons()">Alle</button>
-            <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
-          </div>
-          <div class="angulardiv">
-            <span class="chartHeading">Datensatz:</span>
-              <button class="internationalButton rightButton" ng-repeat="set in datasets" ng-click="selectDataset(set)" ng-class="selectedDataset==set?'active':''">{{strings[set]}}</button>
-          </div>
-          <div class="angulardiv">
-            <span class="chartHeading">Farbe:</span>
-              <button class="internationalButton rightButton colorButton" ng-style="{'background-color':color}" ng-repeat="color in availableColors" ng-click="selectColor(color)" ng-class="selectedColor==color?'active':''">&nbsp;&nbsp;&nbsp;&nbsp;</button>
-          </div>
-          <div class="angulardiv">
-            <button class="internationalButton rightButton" ng-click="addChart()">Add Chart</button>
-            <button class="internationalButton rightButton" ng-click="deleteChart()">Delete Chart</button>
+          <div class="singlecanton">
+            <h4>Chart hinzufügen:</h4>
+            <div class="angulardiv">
+              <span class="chartHeading">Kanton:</span>
+                <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+              <!-- <button class="controlButton" ng-click="showAllCantons()">Alle</button>
+              <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
+            </div>
+            <div class="angulardiv">
+              <span class="chartHeading">Datensatz:</span>
+                <button class="internationalButton rightButton" ng-repeat="set in datasets" ng-click="selectDataset(set)" ng-class="selectedDataset==set?'active':''">{{strings[set]}}</button>
+            </div>
+            <div class="angulardiv">
+              <span class="chartHeading">Farbe:</span>
+                <button class="internationalButton rightButton colorButton" ng-style="{'background-color':color}" ng-repeat="color in availableColors" ng-click="selectColor(color)" ng-class="selectedColor==color?'active':''">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                Eigene: <input type="color" id="html5colorpicker" value="#ff0000" ng-model="myColor" ng-change="colorPicked(myColor)" style="width:24px; height: 30px; vertical-align: middle;">
+            </div>
+            <div class="angulardiv">
+              <button class="internationalButton rightButton" ng-click="addChart()">Hinzufügen</button>
+              <!-- <button class="internationalButton rightButton" ng-click="deleteChart()">Delete Chart</button> -->
+            </div>
           </div>
 
       </article>

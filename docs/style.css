@@ -65,6 +65,7 @@ body {
 /* !main */
 main {
 	padding: 5vw;
+  padding-top: 2vw;
 }
 main a {
 	color: inherit;
@@ -598,6 +599,7 @@ button {
 }
 
 .angulardiv {
+  font-size: 11px;
 }
 
 /* canvas {
@@ -635,5 +637,14 @@ button {
 
 .colorButton.active {
   border: 2px solid #000;
-  border-color: #FFF;
+  border-color: var(--color-main);
+}
+
+.singlecanton {
+  border-top: 1px solid #000;
+  border-color: var(--color-main);
+}
+
+h4 {
+  padding-top: 0.5em;
 }

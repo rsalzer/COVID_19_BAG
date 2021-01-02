@@ -120,6 +120,8 @@ function processData() {
   var angularDiv = document.getElementById("interactive");
   var scope = angular.element(angularDiv).scope()
   scope.addChart();
+  scope.selectedCanton = 'ZH';
+  scope.selectedColor = scope.availableColors[3];
   scope.$apply();
   document.getElementById("loadingspinner").style.display = 'none';
   document.getElementById("loaded").style.display = 'block';
@@ -156,21 +158,22 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
   };
   $scope.datasets = ['cases', 'hosp', 'death', 'test'];
   $scope.availableColors = Chart.defaults.global.colors;
-  $scope.availableColors.push('#CCCC00');
-  $scope.availableColors.push('#CC0000');
+  // $scope.availableColors.push('#CCCC00');
+  // $scope.availableColors.push('#CC0000');
+  $scope.myColor = '#55ff55';
 
   //Chart-Configs:
   $scope.duration = 0;
   $scope.charts = [];
   $scope.showAbsolute = true;
+  $scope.singleScale = false;
 
   //Configs of single chart
-  $scope.index = 0;
   $scope.labels = [];
   $scope.series = [];
   $scope.selectedDataset = 'cases';
   $scope.selectedCanton = 'CH';
-  $scope.selectedColor = $scope.availableColors[0];
+  $scope.selectedColor = $scope.availableColors[2];
 
   $scope.addChart = function() {
     let newChart = {
@@ -204,9 +207,15 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
     //$scope.update();
   }
 
-  $scope.deleteChart = function() {
+  $scope.colorPicked = function(color) {
+    //alert(color);
+    $scope.availableColors.push(color);
+    $scope.selectedColor = color;
+  }
+
+  $scope.deleteChart = function(index) {
     if($scope.charts.length==0) return;
-    $scope.charts.splice($scope.index,1);
+    $scope.charts.splice(index,1);
     $scope.index = 0;
     $scope.update();
   }
@@ -345,7 +354,7 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
           fill: false,
           cubicInterpolationMode: 'monotone',
           spanGaps: true,
-          yAxisID: singleChart.selectedDataset
+          yAxisID: $scope.singleScale?'cases':singleChart.selectedDataset
         });
 
         $scope.data.push(filteredData.map(d => {
