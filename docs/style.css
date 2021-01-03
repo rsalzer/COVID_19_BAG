@@ -81,6 +81,11 @@ body {
 }
 
 @media (max-width: 660px) {
+
+  #page-nav ul {
+  	display: block;
+  }
+
   #page-nav .menu {
     z-index: 5;
     max-height: 0px;
