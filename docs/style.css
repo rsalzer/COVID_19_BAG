@@ -82,11 +82,8 @@ body {
 
 @media (max-width: 660px) {
 
-  #page-nav ul {
-  	display: block;
-  }
-
   #page-nav .menu {
+    display: block;
     z-index: 5;
     max-height: 0px;
     transition: max-height .2s ease-out;
