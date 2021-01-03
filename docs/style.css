@@ -30,13 +30,18 @@ body {
 	padding-left: 5vw;
 	padding-right: 5vw;
 	padding-top: 1em;
+  padding-bottom: 20px;
 	max-width: var(--maxwidth);
-  font-size: 0.8em;
+  font-size: 1em;
+  background-color: var(--color-background);
 }
 #page-nav ul {
 	list-style: none;
 	display: flex;
+  clear: both;
+  z-index: 4;
 }
+
 #page-nav li {
 	margin-right: 1em;
 }
@@ -45,6 +50,7 @@ body {
 	border-color: var(--color-main);
 	cursor: default;
 }
+
 /* #page-nav li:nth-child(4) {
   margin-left: auto;
 } */
@@ -62,10 +68,100 @@ body {
 	border-color: var(--color-main);
 }
 
+#page-nav .menu {
+  clear: none;
+  float: left;
+  max-height: none;
+}
+#page-nav .menu-icon {
+  display: none;
+}
+#page-nav .menu-btn {
+  display: none;
+}
+
+@media (max-width: 660px) {
+  #page-nav .menu {
+    z-index: 5;
+    max-height: 0px;
+    transition: max-height .2s ease-out;
+    margin-top: 2.2em;
+    position: absolute;
+    overflow: hidden;
+    background-color: var(--color-background);
+  }
+
+  /* menu icon */
+
+  #page-nav .menu-icon {
+    cursor: pointer;
+    display: inline-block;
+    float: left;
+    /* padding: 28px 20px; */
+    padding-top: 1em;
+    position: relative;
+    user-select: none;
+  }
+
+  #page-nav .menu-icon .navicon {
+    background: var(--color-main);
+    display: block;
+    height: 2px;
+    position: relative;
+    transition: background .2s ease-out;
+    width: 18px;
+  }
+
+  #page-nav .menu-icon .navicon:before,
+  #page-nav .menu-icon .navicon:after {
+    background: var(--color-main);
+    content: '';
+    display: block;
+    height: 100%;
+    position: absolute;
+    transition: all .2s ease-out;
+    width: 100%;
+  }
+
+  #page-nav .menu-icon .navicon:before {
+    top: 5px;
+  }
+
+  #page-nav .menu-icon .navicon:after {
+    top: -5px;
+  }
+
+  /* menu btn */
+
+  #page-nav .menu-btn {
+    display: none;
+  }
+
+  #page-nav .menu-btn:checked ~ .menu {
+    max-height: 240px;
+  }
+
+  #page-nav .menu-btn:checked ~ .menu-icon .navicon {
+    background: transparent;
+  }
+
+  #page-nav .menu-btn:checked ~ .menu-icon .navicon:before {
+    transform: rotate(-45deg);
+  }
+
+  #page-nav .menu-btn:checked ~ .menu-icon .navicon:after {
+    transform: rotate(45deg);
+  }
+
+  #page-nav .menu-btn:checked ~ .menu-icon:not(.steps) .navicon:before,
+  #page-nav .menu-btn:checked ~ .menu-icon:not(.steps) .navicon:after {
+    top: 0;
+  }
+}
+
 /* !main */
 main {
 	padding: 5vw;
-  padding-top: 2vw;
 }
 main a {
 	color: inherit;
