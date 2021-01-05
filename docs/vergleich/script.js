@@ -37,6 +37,7 @@ function includeHTML() {
           if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
           /* Remove the attribute, and call this function once more: */
           elmnt.removeAttribute("url");
+          document.getElementById("pagenav_vergleich").className = "here";
         }
       }
       xhttp.open("GET", file, true);

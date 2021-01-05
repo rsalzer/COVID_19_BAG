@@ -49,6 +49,7 @@ body {
 	border-bottom: 2px solid #000;
 	border-color: var(--color-main);
 	cursor: default;
+  pointer-events: none;
 }
 
 /* #page-nav li:nth-child(4) {
