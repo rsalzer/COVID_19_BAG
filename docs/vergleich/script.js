@@ -23,7 +23,7 @@ var initialized = false;
 function includeHTML() {
   var z, i, elmnt, file, xhttp;
   /* Loop through a collection of all HTML elements: */
-  z = document.getElementsByTagName("div");
+  z = document.getElementsByTagName("nav");
   for (i = 0; i < z.length; i++) {
     elmnt = z[i];
     /*search for elements with a certain atrribute:*/
@@ -33,8 +33,8 @@ function includeHTML() {
       xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4) {
-          if (this.status == 200) {elmnt.innerHTML = this.responseText;}
-          if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
+          if (this.status == 200) {elmnt.insertAdjacentHTML("afterbegin", this.responseText);}
+          if (this.status == 404) {elmnt.insertAdjacentHTML("afterbegin", "Page not found.");}
           /* Remove the attribute, and call this function once more: */
           elmnt.removeAttribute("url");
           document.getElementById("pagenav_vergleich").className = "here";
@@ -387,6 +387,11 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
         });
 
         $scope.data.push(filteredData.map(d => {
+          // let sum7d = $scope.showAbsolute?d.sum7d:d.inzsum7d;
+          // let yPoint = null;
+          // if(sum7d) {
+          //     yPoint = Math.round(sum7d/7*100)/100;
+          // }
           let yPoint = $scope.showAbsolute?d.mean7d:d.inzmean7d;
           let dateSplit = d.datum.split("-");
           let day = parseInt(dateSplit[2]);
