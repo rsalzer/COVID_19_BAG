@@ -40,7 +40,7 @@
     <main>
 		<header id="page-header">
 			<h1>BAG-Daten im Vergleich</h1>
-			<p>Daten bereitgestellt durch das Bundesamt für Gesundheit (BAG).<br>Alle Daten sind 7-Tages-Durchschnitte.<br><br>Aufbereitet durch <a href="https://twitter.com/rob_salzer">@rob_salzer</a>. <br/>Wenn Dir die Seite gefällt, <a href='https://rsalzer.github.io/simple-qrbill/coffee.html'>spendier mir einen Kaffee</a>.
+			<p>Daten bereitgestellt durch das Bundesamt für Gesundheit (BAG). (Internationale Daten: OWID via BAG)<br>Alle Daten sind 7-Tages-Durchschnitte.<br><br>Aufbereitet durch <a href="https://twitter.com/rob_salzer">@rob_salzer</a>. <br/>Wenn Dir die Seite gefällt, <a href='https://rsalzer.github.io/simple-qrbill/coffee.html'>spendier mir einen Kaffee</a>.
 			<div class="notes">
 				<p></p>
 			</div>
@@ -79,21 +79,28 @@
           <div class="angulardiv">
             <span class="chartHeading">Charts:</span>
               <span ng-repeat="chart in charts">
-                <button class="internationalButton rightButton" ng-click="deleteChart($index)" ng-class="index==$index?'active':''" ng-style="{'border-color': chart.color}">{{strings[chart.selectedDataset]}}-{{chart.canton}}<span style="color: #FF0000"> X</span></button>
+                <button class="internationalButton rightButton" ng-click="deleteChart($index)" ng-class="index==$index?'active':''" ng-style="{'border-color': chart.color}">{{strings[chart.selectedDataset]}}-{{chart.geoUnit.replace("CH_","")}}<span style="color: #FF0000"> X</span></button>
               </span>
               <!-- ng-style="{'background-color':chart.color}" -->
           </div>
           <div class="singlecanton">
             <h4>Chart hinzufügen:</h4>
             <div class="angulardiv">
+              <div class="angulardiv">
+                <span class="chartHeading">Datensatz:</span>
+                  <button class="internationalButton rightButton" ng-repeat="set in datasets" ng-click="selectDataset(set)" ng-class="selectedDataset==set?'active':''">{{strings[set]}}</button>
+              </div>
               <span class="chartHeading">Kanton:</span>
-                <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+                <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedGeoUnit=='CH_'+canton?'active':''">{{canton}}</button>
               <!-- <button class="controlButton" ng-click="showAllCantons()">Alle</button>
               <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
             </div>
-            <div class="angulardiv">
-              <span class="chartHeading">Datensatz:</span>
-                <button class="internationalButton rightButton" ng-repeat="set in datasets" ng-click="selectDataset(set)" ng-class="selectedDataset==set?'active':''">{{strings[set]}}</button>
+            <div class="angulardiv" ng-show="selectedDataset=='cases'">
+              <span class="chartHeading">Land:</span>
+              <button class="internationalButton rightButton" ng-repeat="country in availableCountries" ng-click="selectCountry(country)" ng-class="selectedGeoUnit==country.iso2?'active':''">{{country.name}}</button>
+              More: <select ng-model="pickedCountry" ng-options="country.name for country in countries" ng-change="countryPicked()">
+                <option value="">-- auswählen --</option>
+              </select>
             </div>
             <div class="angulardiv">
               <span class="chartHeading">Farbe:</span>
