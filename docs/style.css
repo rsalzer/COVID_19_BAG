@@ -436,6 +436,10 @@ table.wide th:nth-child(1) span {
 	transform: none;
 	padding-left: 0;
 }
+
+.leftalign {
+  text-align: left;
+}
 /* table.wide th:nth-child(2) {
   width: 25%;
 }

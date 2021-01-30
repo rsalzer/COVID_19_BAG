@@ -161,8 +161,11 @@ function processActualData(mode, chosenDay) {
     let days65 = Math.round((pop65 - vaccLast) / averagePerDay);
     let milis65 = latestDayDate.getTime() + days65 * (1000 * 60 * 60 * 24);
     let date65 = new Date(milis65);
-    console.log(canton+": "+date65.toISOString().substring(0,10));
+    let date65String = date65.toISOString().substring(0,7);
     let days80 = Math.round((pop80 - vaccLast) / averagePerDay);
+    let milis80 = latestDayDate.getTime() + days80 * (1000 * 60 * 60 * 24);
+    let date80 = new Date(milis80);
+    let date80String = date80.toISOString().substring(0,7);
     if(lastDayFilteredByCanton==null) return;
     //console.log(filteredForCanton);
     var tr = document.createElement("tr");
@@ -172,7 +175,9 @@ function processActualData(mode, chosenDay) {
       <td class="total">${lastDayFilteredByCanton.ncumul_vacc_per100pop}</td>
       <td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
       <td class="total">${days65}</td>
+      <td class="total leftalign">(${date65String})</td>
       <td class="total">${days80}</td>
+      <td class="total leftalign">(${date80String})</td>
     `;
 
     table.appendChild(tr);
