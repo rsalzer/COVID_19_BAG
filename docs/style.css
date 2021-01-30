@@ -4,7 +4,7 @@
     --color-main: #000;
     --color-background: #fff;
     --canvas-minwidth: 2700px;
-    --maxwidth: 500px;
+    --maxwidth: 600px;
 }
 @media (prefers-color-scheme: dark) {
     :root {
@@ -403,7 +403,7 @@ table img {
 /* !wide-table */
 table.wide {
 	width: 100%;
-	max-width: 500px;
+	max-width: var(--maxwidth);
 }
 @media (max-width: 660px) {
 	table.wide {
