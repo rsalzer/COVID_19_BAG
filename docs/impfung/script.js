@@ -156,8 +156,8 @@ function processActualData(mode, chosenDay) {
     let firstDayFilteredByCanton = firstDayData.filter(d => d.geounit == canton)[0];
     let vaccLast = parseFloat(lastDayFilteredByCanton.ncumul_vacc);
     let averagePerDay = (vaccLast - parseFloat(firstDayFilteredByCanton.ncumul_vacc)) / daysDifference;
-    let pop65 = population[canton]*0.65;
-    let pop80 = population[canton]*0.8;
+    let pop65 = population[canton]*0.65 * 2; //we need 2 doses per person ...
+    let pop80 = population[canton]*0.8 * 2;//we need 2 doses per person ...
     let days65 = Math.round((pop65 - vaccLast) / averagePerDay);
     let milis65 = latestDayDate.getTime() + days65 * (1000 * 60 * 60 * 24);
     let date65 = new Date(milis65);
