@@ -1,24 +1,5 @@
 var data = [];
 var initialized = false;
-// var oldDate = null;
-// console.logCopy = console.log.bind(console);
-// console.log = function(arguments)
-// {
-//     if (arguments.length)
-//     {
-//         var d = new Date();
-//         if(oldDate==null) timestamp = '';
-//         else {
-//           var diff = d-oldDate;
-//           var msec = diff;
-//           var ss = Math.floor(msec / 1000);
-//           msec -= ss * 1000;
-//           var timestamp = '[' + ss + ':' + msec + '] ';
-//         }
-//         oldDate = d;
-//         this.logCopy(timestamp, arguments);
-//     }
-// };
 
 function includeHTML() {
   var z, i, elmnt, file, xhttp;
@@ -111,20 +92,20 @@ const names = {
   "ZH": "Kanton Zürich",
   "FL": "Fürstentum Liechtenstein"
 };
-
+var ageLabels = ["0-9","10-19","20-29","30-39","40-49","50-59","60-69","70-79","80+"];
 
 Chart.defaults.global.defaultFontFamily = "IBM Plex Sans";
 
 document.getElementById("loaded").style.display = 'none';
 
 getData();
-//getJSON();
 
 function getData() {
   var url = 'https://raw.githubusercontent.com/rsalzer/COVID_19_VACC/main/data.csv';
   d3.csv(url, function(error, csvdata) {
     data = csvdata;
     processData();
+    getBAGMetaData();
   });
 }
 
@@ -133,6 +114,37 @@ function processData() {
   document.getElementById("loadingspinner").style.display = 'none';
   document.getElementById("loaded").style.display = 'block';
 }
+
+function getBAGMetaData() {
+  var url = 'https://www.covid19.admin.ch/api/data/context';
+  d3.json(url, function(error, jsondata) {
+    var fullVaccUrl = jsondata.sources.individual.csv.weeklyVacc.byAge.fullyVaccPersons;
+    var administeredUrl = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccDosesAdministered;
+    getBAGData('full', fullVaccUrl);
+    getBAGData('administered', administeredUrl);
+  });
+}
+
+var ageData = {};
+function getBAGData(name, url) {
+  d3.csv(url, function(error, csvdata) {
+      if(error!=null) {
+        alert("Daten konnten nicht geladen werden");
+      }
+      else {
+        ageData[name] = csvdata;
+        if(Object.keys(ageData).length==2) processAgeData();
+      }
+  });
+}
+
+function processAgeData() {
+  var angularDiv = document.getElementById("interactive");
+  var scope = angular.element(angularDiv).scope()
+  scope.update();
+  scope.$apply();
+}
+
 
 var total;
 var activeMode = "ncumul_conf";
@@ -184,6 +196,107 @@ function processActualData(mode, chosenDay) {
   }
 }
 
+var app = angular.module('vaccinations', ['chart.js']);
+
+app.controller('BarCtrl', ['$scope', function ($scope) {
+  $scope.type = "bar";
+  $scope.options = {
+    legend: { display: false },
+    tooltips: {
+        intersect: false
+    },
+    title: {
+        display: true,
+        text: "Altersverteilung",
+        padding: 15
+    },
+    plugins: {
+      datalabels: getDataLabels(true)
+    },
+    scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            suggestedMax: 100
+          },
+          gridLines: {
+              color: inDarkMode() ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        }]
+    }
+  };
+  $scope.labels = ageLabels;
+  $scope.data = [
+    [10,0,0,0,0,0,0,0,0]
+  ];
+  $scope.colors = [{
+    backgroundColor: ["#2c6a69", "#369381", "#4cb286", "#68c880", "#86d475", "#a1d76c", "#b3d16d", "#b8c17f", "#b7bf82"]
+  }];
+  $scope.cantons = [];
+  $scope.selectedCanton = "";
+  $scope.set = 1;
+  $scope.dataset = "full";
+
+  $scope.selectCanton = function(canton) {
+    $scope.selectedCanton = canton;
+    $scope.update();
+  }
+
+  $scope.getName = function(dataset) {
+    switch (dataset) {
+      case "full": return "Vollständig Geimpft pro 100 Personen";
+      case "doses": return "Verimpfte Dosen pro 100 Personen";
+      case "rawdoses": return "Verimpfte Dosen";
+      default: return "";
+    }
+  }
+
+  $scope.update = function() {
+    if($scope.cantons.length==0) {
+      var cantons = ageData.full.map(d=>d.geoRegion);
+      var unique = cantons.filter((v, i, a) => a.indexOf(v) === i);
+      $scope.cantons = unique;
+      if($scope.selectedCanton=="") $scope.selectedCanton = $scope.cantons[0];
+    }
+    let dataToUse;
+    if($scope.dataset=="full") {
+      dataToUse = ageData.full;
+    }
+    if($scope.dataset=="doses" || $scope.dataset=="rawdoses") {
+      dataToUse = ageData.administered;
+    }
+    let filterDate = dataToUse[dataToUse.length-1].date;
+    dataToUse = dataToUse.filter(d=> d.geoRegion==$scope.selectedCanton && d.date==filterDate);
+    // $scope.series[0] = $scope.set==1?'Fälle':($scope.set==2?'Todesfälle':($scope.set==3?'Inzidenz':'Hospitalisierungen'));
+    // let index = dataToUse.length-6;
+    // if($scope.duration==2) index = dataToUse.findIndex(d=> d.date == "2020-05-31");
+    // else if($scope.duration==4) index = dataToUse.length-11;
+    // let firstData = dataToUse[index];
+    // let latestData = dataToUse[dataToUse.length-1];
+    for(var i=0; i<ageLabels.length; i++) {
+      let label = ageLabels[i];
+      let entry = dataToUse.filter(d => d.altersklasse_covid19.replaceAll(" ","")==label);
+      let value = entry[0].per100PersonsTotal;
+      if($scope.dataset=="rawdoses") value = entry[0].sumTotal;
+      $scope.data[0][i] = value;
+    }
+    //$scope.options.scales.yAxes[0].ticks.suggestedMax = 100;
+    if($scope.dataset=="rawdoses") $scope.options.plugins.datalabels = getDataLabels(false);
+    else $scope.options.plugins.datalabels = getDataLabels(true);
+
+    //var dataset = $scope.set==0?"Vollständig geimpfte Personen":$scope.set==1?"Impfdosen":"";
+    //var time = $scope.duration==1?"Ganze Pandemie":$scope.duration==2?"Ab Juni":$scope.duration==3?"Letzte 7 Tage":"Letzte 14 Tage";
+    var filterDateYear = parseInt(filterDate.substring(0,4));
+    var filterDateWeek = parseInt(filterDate.substring(4));
+    var monday = getDateOfISOWeek(filterDateWeek, filterDateYear);
+    var sunday = new Date(monday);
+    sunday.setDate(sunday.getDate()+6);
+    $scope.options.title.text = "Altersverteilung "+$scope.getName($scope.dataset)+" bis "+formatDate(sunday); //+" "+time;
+  }
+
+
+}]);
+
 function stringToDate(datestring) {
   let dateSplit = datestring.split("-");
   let day = parseInt(dateSplit[2]);
@@ -191,6 +304,43 @@ function stringToDate(datestring) {
   let year = parseInt(dateSplit[0]);
   let d = new Date(Date.UTC(year,month,day))
   return d;
+}
+
+function getDateOfISOWeek(w, y) {
+    var simple = new Date(y, 0, 1 + (w - 1) * 7);
+    var dow = simple.getDay();
+    var ISOweekStart = simple;
+    if (dow <= 4)
+        ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    else
+        ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    return ISOweekStart;
+}
+
+function formatDate(date) {
+  var dd = date.getDate();
+  var mm = date.getMonth()+1;
+  var yy = date.getYear();
+  if(dd<10) dd='0'+dd;
+  if(mm<10) mm='0'+mm;
+  return dd+"."+mm+"."+yy;
+}
+
+function getDataLabels(raw) {
+  return {
+      color: inDarkMode() ? '#ccc' : 'black',
+      font: {
+        weight: 'bold',
+      },
+      align: 'end',
+      anchor: 'end',
+      formatter: function(value, context) {
+        var sum = context.dataset.data.reduce( (acc, val) => acc+parseInt(val), 0);
+        var percentage = Math.round(value / sum * 1000) / 10;
+        if(raw) return value;
+        return percentage+"%";
+      }
+  };
 }
 
 function inDarkMode() {

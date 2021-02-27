@@ -473,8 +473,22 @@ h3 {
 .bagcanvas {
   min-width: 800px;
 }
+#angularagecanvas {
+  width: 100%;
+  min-width: 0px;
+  max-width: 500px;
+}
 button {
 	font-family: "IBM Plex Sans", sans-serif;
+}
+.angulardiv {
+  display: block;
+  font-size: 11px;
+}
+#agecontrols {
+  width: 100%;
+  height: 100%;
+  max-width: 500px;
 }
 .chartButtons {
 	overflow-x: scroll;
@@ -744,9 +758,6 @@ button {
   display: none;
 }
 
-.angulardiv {
-  font-size: 11px;
-}
 
 /* canvas {
   width: 100%;
@@ -789,6 +800,43 @@ button {
 .singlecanton {
   border-top: 1px solid #000;
   border-color: var(--color-main);
+}
+
+.barChartControl {
+      margin: 1em 1em 0 0;
+      padding: 0.2em 0;
+  	  color: var(--color-main);
+      background-color: transparent;
+      border: 0;
+  	  border-bottom: 2px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      text-decoration: capitalize;
+      color: var(--color-main);
+}
+button.barChartControl:hover {
+  border-bottom: 2px solid #000;
+  border-color: var(--color-main);
+}
+button.barChartControl:focus {
+  outline: none;
+}
+.barChartControl.active {
+	cursor: default;
+	border-bottom: 2px solid #000;
+	border-color: var(--color-main);
+}
+.barChartHeading {
+  font-weight: bold;
+  cursor: auto;
+}
+.cell {
+  display: table-cell;
+  padding-right: 5px;
+}
+.rowdiv {
+  display: table-row;
+  font-size: 11px;
 }
 
 h4 {

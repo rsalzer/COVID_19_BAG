@@ -16,8 +16,8 @@
     <script src="../js/d3.v3.js"></script>
     <script src="../js/Chart.bundle.min.js"></script>
     <script src="../js/chartjs-plugin-datalabels.min.js"></script>
-    <!-- <script src="../js/angular.min.js"></script> -->
-    <!-- <script src="../js/angular-chart.min.js"></script> -->
+    <script src="../js/angular.min.js"></script> -->
+    <script src="../js/angular-chart.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../style.css">
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8165RHRWS"></script>
@@ -34,7 +34,7 @@
       }
     </script>
   </head>
-  <body>
+  <body ng-app="vaccinations">
     <a name="top"></a>
     <nav id="page-nav" url="https://rsalzer.github.io/COVID_19_BAG/header.html"></nav>
     <main>
@@ -73,6 +73,30 @@
           <tbody id="impftabelle">
           </tbody>
         </table>
+      </article>
+    </section>
+    <section>
+      <header>
+				<h2>Altersverteilung</h2>
+			</header>
+      <article id="interactive" ng-controller="BarCtrl" style="margin-bottom: 4em;">
+        <canvas id="angularagecanvas" class="chart chart-base" chart-type="type" chart-data="data" chart-colors="colors" chart-labels="labels" chart-series="series" chart-options="options"></canvas>
+        <div id="ageontrols">
+          <div class="rowdiv">
+            <span class="barChartControl barChartHeading cell">Kanton:</span>
+            <span class="cell">
+              <button class="barChartControl" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+            </span>
+          </div>
+          <div class="rowdiv">
+            <span class="barChartControl barChartHeading cell">Datensatz:</span>
+            <span class="cell">
+              <button class="barChartControl" ng-click="dataset='full';update()" ng-class="dataset=='full'?'active':''">{{getName('full')}}</button>
+              <button class="barChartControl" ng-click="dataset='doses';update()" ng-class="dataset=='doses'?'active':''">{{getName('doses')}}</button>
+              <button class="barChartControl" ng-click="dataset='rawdoses';update()" ng-class="dataset=='rawdoses'?'active':''">{{getName('rawdoses')}}</button>
+            </span>
+          </div>
+        </div>
       </article>
     </section>
   </main>
