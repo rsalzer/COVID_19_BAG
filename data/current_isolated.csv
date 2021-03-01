@@ -3,7 +3,8 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-02-25,AI,21,9,5
 2021-02-25,AR,121,37,11
 2021-02-25,BE,757,1609,298
-2021-02-25,BL,236,310,75
+2021-02-28,BL,237,271,111
+2021-02-26,BS,152,165,177
 2021-02-25,FL,20,38,41
 2021-02-25,GE,882,971,569
 2021-02-25,GL,22,63,11
@@ -11,6 +12,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-02-25,JU,89,264,3
 2021-02-25,LU,348,342,151
 2021-02-25,NE,338,424,73
+2021-02-26,OW,40,85,11
 2021-02-25,SG,1395,435,110
 2021-02-25,SH,57,132,26
 2021-02-25,SO,335,782,87
