@@ -25,6 +25,7 @@ try {
 }
 const excelToJson = require('convert-excel-to-json');
 const csv=require('csvtojson');
+const arDownload = require('./ar_scraper');
 
 const cantons = ['AG', 'AI', 'AR', 'BE', 'BL', 'BS', 'FR', 'GE', 'GL', 'GR', 'JU', 'LU', 'NE', 'NW', 'OW', 'SG', 'SH', 'SO', 'SZ', 'TG', 'TI', 'UR', 'VD', 'VS', 'ZG', 'ZH', 'FL'];
 const bagExcelLocation = "https://www.bag.admin.ch/dam/bag/de/dokumente/mt/k-und-i/aktuelle-ausbrueche-pandemien/2019-nCoV/covid-19-datengrundlage-lagebericht.xlsx.download.xlsx/200325_Datengrundlage_Grafiken_COVID-19-Bericht.xlsx";
@@ -310,9 +311,6 @@ function parseExcel() {
         console.log("Download testCases");
         downloadTestcasesFile();
 
-        var oldPath = 'temp.xlsx'
-        var newPath = '../bagfiles/'+date+'.xlsx'
-
         fs.readFile('label.json', (err, data) => {
             if (err) throw err;
             let label = JSON.parse(data);
@@ -321,11 +319,14 @@ function parseExcel() {
             fs.writeFileSync('label.json', JSON.stringify(label));
         });
 
+        var oldPath = 'temp.xlsx'
+        var newPath = '../bagfiles/'+date+'.xlsx'
         fs.rename(oldPath, newPath, function (err) {
           if (err) throw err
           console.log('\x1b[42m%s\x1b[0m', 'Successfully renamed temp.xlsx - AKA moved!')
 
           tweetNewNumbers();
+          arDownload.start();
           listFiles();
         });
     });
