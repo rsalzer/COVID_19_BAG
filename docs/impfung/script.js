@@ -1,4 +1,4 @@
-var data = [];
+// var data = [];
 var initialized = false;
 
 function includeHTML() {
@@ -98,42 +98,53 @@ Chart.defaults.global.defaultFontFamily = "IBM Plex Sans";
 
 document.getElementById("loaded").style.display = 'none';
 
-getData();
+// getData();
+//
+// function getData() {
+//   var url = 'https://raw.githubusercontent.com/rsalzer/COVID_19_VACC/main/data.csv';
+//   d3.csv(url, function(error, csvdata) {
+//     data = csvdata;
+//     processData();
+//     getBAGMetaData();
+//   });
+// }
 
-function getData() {
-  var url = 'https://raw.githubusercontent.com/rsalzer/COVID_19_VACC/main/data.csv';
-  d3.csv(url, function(error, csvdata) {
-    data = csvdata;
-    processData();
-    getBAGMetaData();
-  });
-}
+getBAGMetaData();
 
 function processData() {
   processActualData(null, null);
+  //console.log(verlaufData);
   document.getElementById("loadingspinner").style.display = 'none';
   document.getElementById("loaded").style.display = 'block';
 }
 
+var ageData = {};
+var verlaufData = {};
 function getBAGMetaData() {
   var url = 'https://www.covid19.admin.ch/api/data/context';
   d3.json(url, function(error, jsondata) {
-    var fullVaccUrl = jsondata.sources.individual.csv.weeklyVacc.byAge.fullyVaccPersons;
-    var administeredUrl = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccDosesAdministered;
-    getBAGData('full', fullVaccUrl);
-    getBAGData('administered', administeredUrl);
+    var fullVaccUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.fullyVaccPersons;
+    var administeredUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccDosesAdministered;
+    var fullVaccUrl = jsondata.sources.individual.csv.fullyVaccPersons;
+    var administeredUrl = jsondata.sources.individual.csv.vaccDosesAdministered;
+    var deliveredUrl = jsondata.sources.individual.csv.vaccDosesDelivered;
+    getBAGData('full', fullVaccUrl, verlaufData);
+    getBAGData('administered', administeredUrl, verlaufData);
+    getBAGData('full', fullVaccUrlAge, ageData);
+    getBAGData('administered', administeredUrlAge, ageData);
+    //getBAGData('delivered', deliveredUrl, verlaufData);
   });
 }
 
-var ageData = {};
-function getBAGData(name, url) {
+function getBAGData(name, url, dataobject) {
   d3.csv(url, function(error, csvdata) {
       if(error!=null) {
         alert("Daten konnten nicht geladen werden");
       }
       else {
-        ageData[name] = csvdata;
+        dataobject[name] = csvdata;
         if(Object.keys(ageData).length==2) processAgeData();
+        if(Object.keys(verlaufData).length==2) processData();
       }
   });
 }
@@ -150,11 +161,13 @@ var total;
 var activeMode = "ncumul_conf";
 var activeDay = 0; //0 = today; -1 = yesterday; -2 = two days ago;
 function processActualData(mode, chosenDay) {
+  var data = verlaufData.administered;
   let latestDay = data[data.length-1].date;
   let dateSpan = document.getElementById("dateSpan");
   dateSpan.innerHTML = latestDay;
   let todaysData = data.filter(d => d.date == latestDay);
-  let firstDay = data[0].date;
+  let fullData = verlaufData.full.filter(d => d.date==latestDay);
+  let firstDay =  "2021-01-24"; //"2021-02-14";
   let firstDayData = data.filter(d=> d.date == firstDay);
   let table = document.getElementById("impftabelle");
   table.innerHTML = "";
@@ -164,12 +177,19 @@ function processActualData(mode, chosenDay) {
   console.log("Day difference: "+daysDifference);
   for(var i=0; i<cantons.length; i++) {
     let canton = cantons[i];
-    let lastDayFilteredByCanton = todaysData.filter(d => d.geounit == canton)[0];
-    let firstDayFilteredByCanton = firstDayData.filter(d => d.geounit == canton)[0];
-    let vaccLast = parseFloat(lastDayFilteredByCanton.ncumul_vacc);
-    let averagePerDay = (vaccLast - parseFloat(firstDayFilteredByCanton.ncumul_vacc)) / daysDifference;
+    let lastDayFilteredByCanton = todaysData.filter(d => d.geoRegion == canton)[0];
+    let full = fullData.filter(d => d.geoRegion == canton)[0];
+    let firstDayFilteredByCanton = firstDayData.filter(d => d.geoRegion == canton)[0];
+    let vaccLast = parseFloat(lastDayFilteredByCanton.sumTotal);
+    let averagePerDay = (vaccLast - parseFloat(firstDayFilteredByCanton.sumTotal)) / daysDifference;
+    // let pop30 = population[canton]*0.3 * 2;
     let pop65 = population[canton]*0.65 * 2; //we need 2 doses per person ...
     let pop80 = population[canton]*0.8 * 2;//we need 2 doses per person ...
+    // let days30 = Math.round((pop30 - vaccLast) / averagePerDay);
+    // let milis30 = latestDayDate.getTime() + days30 * (1000 * 60 * 60 * 24);
+    // let date30 = new Date(milis30);
+    // let date30String = date30.toISOString().substring(0,7);
+    // console.log(canton+": "+date30String);
     let days65 = Math.round((pop65 - vaccLast) / averagePerDay);
     let milis65 = latestDayDate.getTime() + days65 * (1000 * 60 * 60 * 24);
     let date65 = new Date(milis65);
@@ -184,8 +204,9 @@ function processActualData(mode, chosenDay) {
     tr.innerHTML = `
       <td><a class='flag ${canton}' href='#detail_${canton}'>${canton}</a></td>
       <td class="total">${vaccLast.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
-      <td class="total">${lastDayFilteredByCanton.ncumul_vacc_per100pop}</td>
+      <td class="total">${lastDayFilteredByCanton.per100PersonsTotal}</td>
       <td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
+      <td class="total">${full.per100PersonsTotal}</td>
       <td class="total">${days65}</td>
       <td class="total leftalign">(${date65String})</td>
       <td class="total">${days80}</td>

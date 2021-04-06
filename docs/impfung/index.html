@@ -64,6 +64,7 @@
               <th class="total"><span>Verimpfte Dosen</span></th>
               <th class="total"><span>% der Bevölkerung</span></th>
               <th class="total"><span>Ø pro Tag</span></th>
+              <th class="total"><span>% vollständig geimpft</span></th>
               <th class="total"><span>Tage bis 65% (2 Dosen)</span></th>
               <th></th>
               <th class="total"><span>Tage bis 80% (2 Dosen)</span></th>
@@ -75,11 +76,12 @@
         </table>
       </article>
     </section>
+    </div>
     <section>
       <header>
 				<h2>Altersverteilung</h2>
 			</header>
-      <article id="interactive" ng-controller="BarCtrl" style="margin-bottom: 4em;">
+      <article id="interactive" ng-controller="BarCtrl">
         <canvas id="angularagecanvas" class="chart chart-base" chart-type="type" chart-data="data" chart-colors="colors" chart-labels="labels" chart-series="series" chart-options="options"></canvas>
         <div id="ageontrols">
           <div class="rowdiv">
@@ -99,6 +101,11 @@
         </div>
       </article>
     </section>
+    <!-- <section>
+      <header>
+        <h2>Verlauf</h2>
+      </header>
+    </section> -->
   </main>
   <footer id="page-footer">
 		<p>
