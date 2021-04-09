@@ -101,11 +101,25 @@
         </div>
       </article>
     </section>
-    <!-- <section>
+    <section id="detail">
       <header>
-        <h2>Verlauf</h2>
+  			<h2>Verlauf</h2>
       </header>
-    </section> -->
+      <article ng-controller="ChartCtrl" id="interactive2">
+        <h3><span class="flag {{selectedCanton}}">&nbsp;</span> Verimpfte Dosen pro Tag</h3>
+        <div class="canvascontainer">
+          <canvas id="angularcanvas" class="chart chart-bar angularchart" chart-colors="colors" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride"></canvas>
+        </div>
+        <div id="controls">
+          <div class="angulardiv">
+            <span class="chartHeading">Kanton:</span>
+              <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+            <!-- <button class="controlButton" ng-click="showAllCantons()">Alle</button>
+            <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
+          </div>
+        </div>
+      </article>
+    </section>
   </main>
   <footer id="page-footer">
 		<p>

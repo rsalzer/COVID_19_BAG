@@ -113,6 +113,10 @@ getBAGMetaData();
 
 function processData() {
   processActualData(null, null);
+  var angularDiv = document.getElementById("interactive2");
+  var scope = angular.element(angularDiv).scope()
+  scope.update();
+  scope.$apply();
   //console.log(verlaufData);
   document.getElementById("loadingspinner").style.display = 'none';
   document.getElementById("loaded").style.display = 'block';
@@ -143,9 +147,11 @@ function getBAGData(name, url, dataobject) {
       }
       else {
         dataobject[name] = csvdata;
-        if(Object.keys(ageData).length==2) processAgeData();
-        if(Object.keys(verlaufData).length==2) processData();
-      }
+        if(Object.keys(verlaufData).length==2 && Object.keys(ageData).length==2) {
+           processData();
+           processAgeData();
+         }
+       }
   });
 }
 
@@ -314,7 +320,170 @@ app.controller('BarCtrl', ['$scope', function ($scope) {
     sunday.setDate(sunday.getDate()+6);
     $scope.options.title.text = "Altersverteilung "+$scope.getName($scope.dataset)+" bis "+formatDate(sunday); //+" "+time;
   }
+}]);
 
+app.controller('ChartCtrl', ['$scope', function ($scope) {
+
+  $scope.labels = [];
+  $scope.series = [];
+  $scope.lineColor = inDarkMode()?'#FFFFFF':'#111111';
+  $scope.barColor = '#22BB22';
+  $scope.colors = [$scope.lineColor, $scope.barColor];
+  $scope.cantons = cantons;
+
+  $scope.selectedCanton = 'CH';
+
+  $scope.selectCanton = function(canton) {
+    $scope.selectedCanton = canton;
+    $scope.update();
+  }
+
+  $scope.type = "bar";
+
+  $scope.data = [0];
+
+  $scope.options = {
+    animation: false,
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: {
+        padding: {
+            right: 0
+        }
+    },
+    legend: {
+      display: false
+    },
+    title: {
+      display: false
+    },
+    tooltips: {
+      mode: 'index',
+      intersect: false,
+      caretSize: 0,
+      bodyFontFamily: 'IBM Plex Mono'
+    },
+    elements: {
+      point: { radius: 0 }
+    },
+    scales: {
+      xAxes: [{
+          type: 'time',
+          time: {
+            tooltipFormat: 'ddd DD.MM.YYYY',
+            unit: 'month',
+            displayFormats: {
+              day: 'DD.MM'
+            }
+          },
+          ticks: {
+            minRotation: (getDeviceState()==2?90:0),
+            maxRotation: 90
+            // min: getDateForMode(mode),
+            // max: new Date(),
+          },
+          gridLines: {
+              color: inDarkMode() ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        }],
+        yAxes: [{
+          type: 'linear',
+          position: 'right',
+          ticks: {
+            beginAtZero: true,
+            //suggestedMax: 100
+          },
+          gridLines: {
+              color: inDarkMode() ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        }]
+      },
+    plugins: {
+      datalabels: {
+        display: false
+      }
+    }
+  };
+  $scope.datasetOverride = [{
+      label: "Totale Impfungen",
+      fill: false,
+      cubicInterpolationMode: 'monotone',
+      spanGaps: true
+  }];
+
+  //$scope.colors = [ 'white' ];
+  $scope.update = function() {
+    //console.log("Update");
+    $scope.data = [];
+    $scope.datasetOverride = [];
+    var dataToUse = verlaufData.administered;
+    let filteredData = dataToUse.filter(d => d.geoRegion===$scope.selectedCanton);
+    var days = 0;
+    var needsCorrection = false;
+    if(filteredData[0].entries=="NA") needsCorrection = true;
+    if(needsCorrection) {
+      //console.log("Needs Correction");
+      filteredData.forEach((element, index, array) => {
+        if(element.entries=="NA") {
+          if(index!=0) {
+            var diff = parseInt(element.sumTotal) - parseInt(array[index-1].sumTotal);
+            if(diff==0) {
+              days++;
+              element.entries = 0;
+            }
+            else {
+              var diffPerDay = Math.round(diff/(days+1));
+              if(diffPerDay<0) diffPerDay = 0;
+              for(let i=0; i<=days; i++) {
+                array[index-i].entries = diffPerDay;
+              }
+              days = 0;
+            }
+          }
+          else
+            element.entries = 0
+        }
+      });
+      filteredData.forEach((element, index, array) => {
+        if(index>2) { //Calculate 7d-Avg
+          var total = 0;
+          for(let i=0; i<7; i++) {
+            if(index-i>0) total += array[index-i].entries;
+          }
+          var number = 7;
+          if(index<7) number = index;
+          element.mean7d = Math.round(total/number);
+        }
+      });
+    }
+    filteredData.shift(); //remove first element
+    //console.log(filteredData);
+    $scope.options.scales.xAxes[0].time.unit = 'day';
+    $scope.labels = filteredData.map(d => {
+      var dateSplit = d.date.split("-");
+      var day = parseInt(dateSplit[2]);
+      var month = parseInt(dateSplit[1])-1;
+      var year = parseInt(dateSplit[0]);
+      return new Date(year,month,day);
+    });
+    $scope.datasetOverride = [
+    {
+      label: "7d-Durchschnitt",
+      type: 'line',
+      fill: false,
+    },
+    {
+        label: "Verimpfte Dosen",
+        type: 'bar',
+        backgroundColor: $scope.barColor,
+        //cubicInterpolationMode: 'monotone',
+        //spanGaps: true
+    }
+    ];
+    $scope.data = [];
+    $scope.data.push(filteredData.map(d => d.mean7d));
+    $scope.data.push(filteredData.map((d,index) => d.entries!="NA"?d.entries:d.sumTotal)); //(index==0?d.entries:d.mean7d)
+  }
 
 }]);
 
