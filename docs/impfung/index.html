@@ -91,6 +91,20 @@
           </tbody>
         </table>
       </article>
+      <article id="calculator" ng-controller="SpeedCtrl">
+        <h3 id="title">Impfgeschwindigkeitsrechner</h3>
+        <table>
+          <tr><td>Bereits verimpfte Dosen ({{dateNow | date:'dd.MM.yyyy'}}):</td><td><input type="text" ng-model="dosesTillNow"/></td></tr>
+          <tr><td><b>Zielparameter</b></td></tr>
+          <tr><td>Einwohner:</td><td><input type="text" ng-model="population"/></td></tr>
+          <tr><td>Prozent geimpfter Einwohner:</td><td><input type="text" ng-model="percent"/></td></tr>
+          <tr><td>Benötigte Dosen (2 Dosen pro Person):</td><td>{{dosesNeeded()}}</td></tr>
+          <tr><td>Geschwindigkeit (Dosen pro Tag):</td><td><input type="text" ng-model="dosesPerDay"/></td></tr>
+          <tr><td><b>Ziel erreicht</b></td></tr>
+          <tr><td>Tage bis Ziel erreicht:</td><td>{{daysTillGoal()}}</td></tr>
+          <tr><td>Datum:</td><td>{{dateOfGoal()}}</td></tr>
+        </table>
+      </article>
     </section>
     </div>
     <section>

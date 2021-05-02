@@ -167,6 +167,7 @@ function processAgeData() {
 var total;
 var activeMode = "ncumul_conf";
 var activeDay = 0; //0 = today; -1 = yesterday; -2 = two days ago;
+var latestDayDate;
 function processActualData(mode, chosenDay) {
   var data = verlaufData.administered;
   let latestDay = data[data.length-1].date;
@@ -178,7 +179,7 @@ function processActualData(mode, chosenDay) {
   let firstDayData = data.filter(d=> d.date == firstDay);
   let table = document.getElementById("impftabelle");
   table.innerHTML = "";
-  let latestDayDate = stringToDate(latestDay);
+  latestDayDate = stringToDate(latestDay);
   let firstDayDate = stringToDate(firstDay);
   let daysDifference = (latestDayDate.getTime() - firstDayDate.getTime()) / (1000 * 60 * 60 * 24);
   console.log("Day difference: "+daysDifference);
@@ -323,9 +324,42 @@ function processSpeedData() {
 
     table.appendChild(tr);
   }
+  putDataInCalculator();
+}
+
+function putDataInCalculator() {
+  var angularDiv = document.getElementById("calculator");
+  var scope = angular.element(angularDiv).scope()
+  var data = verlaufData.administered;
+  let latestDay = data[data.length-1].date;
+  let todaysData = data.filter(d => d.date == latestDay);
+  let todayCH = todaysData.filter(d => d.geoRegion=='CH')[0];
+  scope.dateNow = latestDayDate;
+  scope.dosesTillNow = todayCH.sumTotal;
+  scope.dosesPerDay = todayCH.mean7d;
+  scope.$apply();
 }
 
 var app = angular.module('vaccinations', ['chart.js']);
+
+app.controller('SpeedCtrl', ['$scope', function ($scope) {
+  $scope.dateNow = 0;
+  $scope.dosesTillNow = 0;
+  $scope.population = population['CH'];
+  $scope.percent = 85;
+  $scope.dosesNeeded = function() {
+    return Math.ceil($scope.population*2*$scope.percent/100-$scope.dosesTillNow);
+  }
+  $scope.dosesPerDay = 10000;
+  $scope.daysTillGoal = function() {
+    return Math.round($scope.dosesNeeded()/$scope.dosesPerDay);
+  };
+  $scope.dateOfGoal = function() {
+    if($scope.dateNow==0) return 0;
+    var dateOfGoal = new Date($scope.dateNow.getTime() + $scope.daysTillGoal() * (1000 * 60 * 60 * 24));
+    return formatDate(dateOfGoal);
+  };
+}]);
 
 app.controller('BarCtrl', ['$scope', function ($scope) {
   $scope.type = "bar";

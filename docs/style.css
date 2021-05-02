@@ -16,7 +16,7 @@
 	margin: 0;
 	padding: 0;
 }
-html {
+html, input {
 	font-family: "IBM Plex Sans", sans-serif;
 	line-height: 1.3;
 }
@@ -476,7 +476,7 @@ h3 {
 #angularagecanvas {
   width: 100%;
   min-width: 0px;
-  max-width: 500px;
+  max-width: 600px;
 }
 button {
 	font-family: "IBM Plex Sans", sans-serif;
@@ -690,6 +690,10 @@ button {
 	.flag.VS { background-image: url(flags/vs-dark.png); }
 	.flag.ZG { background-image: url(flags/zg-dark.png); }
 	.flag.ZH { background-image: url(flags/zh-dark.png); }
+}
+
+input {
+    text-align: right;
 }
 
 /* !page-footer */
