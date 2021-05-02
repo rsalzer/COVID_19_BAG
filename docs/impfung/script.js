@@ -113,6 +113,7 @@ getBAGMetaData();
 
 function processData() {
   processActualData(null, null);
+  processSpeedData();
   var angularDiv = document.getElementById("interactive2");
   var scope = angular.element(angularDiv).scope()
   scope.update();
@@ -183,11 +184,51 @@ function processActualData(mode, chosenDay) {
   console.log("Day difference: "+daysDifference);
   for(var i=0; i<cantons.length; i++) {
     let canton = cantons[i];
+    var days = 0;
+    let filteredData = data.filter(d => d.geoRegion===canton);
+    var needsCorrection = false;
+    if(filteredData[0].entries=="NA") needsCorrection = true;
+    if(needsCorrection) {
+      //console.log("Needs Correction");
+      filteredData.forEach((element, index, array) => {
+        if(element.entries=="NA") {
+          if(index!=0) {
+            var diff = parseInt(element.sumTotal) - parseInt(array[index-1].sumTotal);
+            if(diff==0) {
+              days++;
+              element.entries = 0;
+            }
+            else {
+              var diffPerDay = Math.round(diff/(days+1));
+              if(diffPerDay<0) diffPerDay = 0;
+              for(let i=0; i<=days; i++) {
+                array[index-i].entries = diffPerDay;
+              }
+              days = 0;
+            }
+          }
+          else
+            element.entries = 0
+        }
+      });
+      filteredData.forEach((element, index, array) => {
+        if(index>2) { //Calculate 7d-Avg
+          var total = 0;
+          for(let i=0; i<7; i++) {
+            if(index-i>0) total += array[index-i].entries;
+          }
+          var number = 7;
+          if(index<7) number = index;
+          element.mean7d = Math.round(total/number);
+        }
+      });
+    }
     let lastDayFilteredByCanton = todaysData.filter(d => d.geoRegion == canton)[0];
     let full = fullData.filter(d => d.geoRegion == canton)[0];
     let firstDayFilteredByCanton = firstDayData.filter(d => d.geoRegion == canton)[0];
     let vaccLast = parseFloat(lastDayFilteredByCanton.sumTotal);
     let averagePerDay = (vaccLast - parseFloat(firstDayFilteredByCanton.sumTotal)) / daysDifference;
+    //if(canton=="CH") averagePerDay = 40501;
     // let pop30 = population[canton]*0.3 * 2;
     let pop65 = population[canton]*0.65 * 2; //we need 2 doses per person ...
     let pop80 = population[canton]*0.8 * 2;//we need 2 doses per person ...
@@ -210,14 +251,75 @@ function processActualData(mode, chosenDay) {
     tr.innerHTML = `
       <td><a class='flag ${canton}' href='#detail_${canton}'>${canton}</a></td>
       <td class="total">${vaccLast.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
-      <td class="total">${lastDayFilteredByCanton.per100PersonsTotal}</td>
-      <td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
-      <td class="total">${full.per100PersonsTotal}</td>
-      <td class="total">${days65}</td>
-      <td class="total leftalign">(${date65String})</td>
-      <td class="total">${days80}</td>
-      <td class="total leftalign">(${date80String})</td>
+      <td class="total">${lastDayFilteredByCanton.per100PersonsTotal}%</td>
+      <td class="total">${full.sumTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
+      <td class="total">${full.per100PersonsTotal}%</td>
     `;
+    //<td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
+    // <td class="total">${days65}</td>
+    // <td class="total leftalign">(${date65String})</td>
+    // <td class="total">${days80}</td>
+    // <td class="total leftalign">(${date80String})</td>
+
+    table.appendChild(tr);
+  }
+}
+
+function processSpeedData() {
+  var data = verlaufData.administered;
+  let latestDay = data[data.length-1].date;
+  let todaysData = data.filter(d => d.date == latestDay);
+  let firstDay =  "2021-01-24"; //"2021-02-14";
+  let firstDayData = data.filter(d=> d.date == firstDay);
+  let latestDayDate = stringToDate(latestDay);
+  let firstDayDate = stringToDate(firstDay);
+  let daysDifference = (latestDayDate.getTime() - firstDayDate.getTime()) / (1000 * 60 * 60 * 24);
+  let table = document.getElementById("speedtabelle");
+  table.innerHTML = "";
+  for(var i=0; i<cantons.length; i++) {
+    let canton = cantons[i];
+    var days = 0;
+    let lastDayFilteredByCanton = todaysData.filter(d => d.geoRegion == canton)[0];
+
+    let firstDayFilteredByCanton = firstDayData.filter(d => d.geoRegion == canton)[0];
+    let vaccLast = parseFloat(lastDayFilteredByCanton.sumTotal);
+    let averagePerDay = (vaccLast - parseFloat(firstDayFilteredByCanton.sumTotal)) / daysDifference;
+    let dataWithAverages = data.filter(d => d.geoRegion == canton && d.mean7d!="NA");
+    let averageLast7Days = dataWithAverages[dataWithAverages.length-1].mean7d;
+    let averagePerDayPer100 = Math.round(averagePerDay*100*100/population[canton])/100;
+    let averageLast7DaysPer100 = Math.round(averageLast7Days*100*100/population[canton])/100;
+    //if(canton=="CH") averagePerDay = 40501;
+    // let pop30 = population[canton]*0.3 * 2;
+    // let pop65 = population[canton]*0.65 * 2; //we need 2 doses per person ...
+    // let pop80 = population[canton]*0.8 * 2;//we need 2 doses per person ...
+    // let days30 = Math.round((pop30 - vaccLast) / averagePerDay);
+    // let milis30 = latestDayDate.getTime() + days30 * (1000 * 60 * 60 * 24);
+    // let date30 = new Date(milis30);
+    // let date30String = date30.toISOString().substring(0,7);
+    // console.log(canton+": "+date30String);
+    // let days65 = Math.round((pop65 - vaccLast) / averagePerDay);
+    // let milis65 = latestDayDate.getTime() + days65 * (1000 * 60 * 60 * 24);
+    // let date65 = new Date(milis65);
+    // let date65String = date65.toISOString().substring(0,7);
+    // let days80 = Math.round((pop80 - vaccLast) / averagePerDay);
+    // let milis80 = latestDayDate.getTime() + days80 * (1000 * 60 * 60 * 24);
+    // let date80 = new Date(milis80);
+    // let date80String = date80.toISOString().substring(0,7);
+    if(lastDayFilteredByCanton==null) return;
+    //console.log(filteredForCanton);
+    var tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><a class='flag ${canton}' href='#detail_${canton}'>${canton}</a></td>
+      <td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
+      <td>${averagePerDayPer100}%</td>
+      <td class="total">${Math.round(averageLast7Days).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
+      <td>${averageLast7DaysPer100}%</td>
+    `;
+    //<td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
+    // <td class="total">${days65}</td>
+    // <td class="total leftalign">(${date65String})</td>
+    // <td class="total">${days80}</td>
+    // <td class="total leftalign">(${date80String})</td>
 
     table.appendChild(tr);
   }
@@ -418,44 +520,6 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
     $scope.datasetOverride = [];
     var dataToUse = verlaufData.administered;
     let filteredData = dataToUse.filter(d => d.geoRegion===$scope.selectedCanton);
-    var days = 0;
-    var needsCorrection = false;
-    if(filteredData[0].entries=="NA") needsCorrection = true;
-    if(needsCorrection) {
-      //console.log("Needs Correction");
-      filteredData.forEach((element, index, array) => {
-        if(element.entries=="NA") {
-          if(index!=0) {
-            var diff = parseInt(element.sumTotal) - parseInt(array[index-1].sumTotal);
-            if(diff==0) {
-              days++;
-              element.entries = 0;
-            }
-            else {
-              var diffPerDay = Math.round(diff/(days+1));
-              if(diffPerDay<0) diffPerDay = 0;
-              for(let i=0; i<=days; i++) {
-                array[index-i].entries = diffPerDay;
-              }
-              days = 0;
-            }
-          }
-          else
-            element.entries = 0
-        }
-      });
-      filteredData.forEach((element, index, array) => {
-        if(index>2) { //Calculate 7d-Avg
-          var total = 0;
-          for(let i=0; i<7; i++) {
-            if(index-i>0) total += array[index-i].entries;
-          }
-          var number = 7;
-          if(index<7) number = index;
-          element.mean7d = Math.round(total/number);
-        }
-      });
-    }
     filteredData.shift(); //remove first element
     //console.log(filteredData);
     $scope.options.scales.xAxes[0].time.unit = 'day';
