@@ -473,11 +473,12 @@ h3 {
 .bagcanvas {
   min-width: 800px;
 }
-#angularagecanvas {
+.agecanvas {
   width: 100%;
   min-width: 0px;
   max-width: 600px;
 }
+
 button {
 	font-family: "IBM Plex Sans", sans-serif;
 }
