@@ -93,6 +93,22 @@ const names = {
   "FL": "Fürstentum Liechtenstein"
 };
 var ageLabels = ["0-9","10-19","20-29","30-39","40-49","50-59","60-69","70-79","80+"];
+var locations = [
+  "vaccination_centre",
+  "medical_practice",
+  "nursing_home",
+  "hospital",
+  "pharmacy",
+  "other"
+];
+var locationTexts = {
+  "hospital": "Spitäler",
+  "medical_practice": "Arztpraxen",
+  "nursing_home": "Pflege-/Alterszentren",
+  "pharmacy": "Apotheken",
+  "vaccination_centre": "Impfzentren",
+  "other": "Andere"
+};
 
 Chart.defaults.global.defaultFontFamily = "IBM Plex Sans";
 
@@ -125,11 +141,13 @@ function processData() {
 
 var ageData = {};
 var verlaufData = {};
+var locationData = {};
 function getBAGMetaData() {
   var url = 'https://www.covid19.admin.ch/api/data/context';
   d3.json(url, function(error, jsondata) {
     var fullVaccUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.fullyVaccPersons;
     var administeredUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccDosesAdministered;
+    var locationUrl = jsondata.sources.individual.csv.weeklyVacc.byLocation.vaccDosesAdministered;
     var fullVaccUrl = jsondata.sources.individual.csv.fullyVaccPersons;
     var administeredUrl = jsondata.sources.individual.csv.vaccDosesAdministered;
     var deliveredUrl = jsondata.sources.individual.csv.vaccDosesDelivered;
@@ -137,6 +155,7 @@ function getBAGMetaData() {
     getBAGData('administered', administeredUrl, verlaufData);
     getBAGData('full', fullVaccUrlAge, ageData);
     getBAGData('administered', administeredUrlAge, ageData);
+    getBAGData('administered', locationUrl, locationData);
     //getBAGData('delivered', deliveredUrl, verlaufData);
   });
 }
@@ -148,9 +167,10 @@ function getBAGData(name, url, dataobject) {
       }
       else {
         dataobject[name] = csvdata;
-        if(Object.keys(verlaufData).length==2 && Object.keys(ageData).length==2) {
+        if(Object.keys(verlaufData).length==2 && Object.keys(ageData).length==2 && Object.keys(locationData).length==1) {
            processData();
            processAgeData();
+           processLocationData();
          }
        }
   });
@@ -158,6 +178,13 @@ function getBAGData(name, url, dataobject) {
 
 function processAgeData() {
   var angularDiv = document.getElementById("interactive");
+  var scope = angular.element(angularDiv).scope()
+  scope.update();
+  scope.$apply();
+}
+
+function processLocationData() {
+  var angularDiv = document.getElementById("locationdiv");
   var scope = angular.element(angularDiv).scope()
   scope.update();
   scope.$apply();
@@ -330,13 +357,8 @@ function processSpeedData() {
 function putDataInCalculator() {
   var angularDiv = document.getElementById("calculator");
   var scope = angular.element(angularDiv).scope()
-  var data = verlaufData.administered;
-  let latestDay = data[data.length-1].date;
-  let todaysData = data.filter(d => d.date == latestDay);
-  let todayCH = todaysData.filter(d => d.geoRegion=='CH')[0];
   scope.dateNow = latestDayDate;
-  scope.dosesTillNow = todayCH.sumTotal;
-  scope.dosesPerDay = todayCH.mean7d;
+  scope.selectCanton("CH");
   scope.$apply();
 }
 
@@ -359,6 +381,19 @@ app.controller('SpeedCtrl', ['$scope', function ($scope) {
     var dateOfGoal = new Date($scope.dateNow.getTime() + $scope.daysTillGoal() * (1000 * 60 * 60 * 24));
     return formatDate(dateOfGoal);
   };
+  $scope.cantons = cantons;
+  $scope.selectedCanton = "CH";
+  $scope.selectCanton = function(canton) {
+    $scope.selectedCanton = canton;
+    $scope.population = population[canton];
+    let dataWithAverages = verlaufData.administered.filter(d => d.geoRegion == canton && d.mean7d!="NA");
+    let averageLast7Days = dataWithAverages[dataWithAverages.length-1].mean7d;
+    let latestDay = verlaufData.administered[verlaufData.administered.length-1].date;
+    let todaysData = verlaufData.administered.filter(d => d.date == latestDay && d.geoRegion == canton)[0];
+    $scope.dosesPerDay = Math.round(averageLast7Days);
+    $scope.dosesTillNow = todaysData.sumTotal;
+    $scope.$apply();
+  }
 }]);
 
 app.controller('BarCtrl', ['$scope', function ($scope) {
@@ -455,6 +490,95 @@ app.controller('BarCtrl', ['$scope', function ($scope) {
     var sunday = new Date(monday);
     sunday.setDate(sunday.getDate()+6);
     $scope.options.title.text = "Altersverteilung "+$scope.getName($scope.dataset)+" bis "+formatDate(sunday); //+" "+time;
+  }
+}]);
+
+app.controller('LocationCtrl', ['$scope', function ($scope) {
+  $scope.type = "bar";
+  $scope.options = {
+    legend: { display: false },
+    tooltips: {
+        intersect: false
+    },
+    title: {
+        display: true,
+        text: "Ortsverteilung",
+        padding: 15
+    },
+    plugins: {
+      datalabels: getDataLabels(true, true)
+    },
+    scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            //suggestedMax: 100
+          },
+          gridLines: {
+              color: inDarkMode() ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        }]
+    }
+  };
+  $scope.labels = locations.map(d=>locationTexts[d]);
+  $scope.data = [
+    [10,0,0,0,0,0]
+  ];
+  $scope.colors = [{
+    backgroundColor: ["#2c6a69", "#369381", "#4cb286", "#68c880", "#86d475", "#a1d76c", "#b3d16d", "#b8c17f", "#b7bf82"]
+  }];
+  $scope.cantons = [];
+  $scope.selectedCanton = "";
+  $scope.set = 1;
+  $scope.dataset = "full";
+
+  $scope.selectCanton = function(canton) {
+    $scope.selectedCanton = canton;
+    $scope.update();
+  }
+
+  $scope.getName = function(dataset) {
+    switch (dataset) {
+      case "full": return "Vollständig Geimpft pro 100 Personen";
+      case "doses": return "Verimpfte Dosen pro 100 Personen";
+      case "rawdoses": return "Verimpfte Dosen";
+      default: return "";
+    }
+  }
+
+  $scope.update = function() {
+    if($scope.cantons.length==0) {
+      var cantons = locationData.administered.map(d=>d.geoRegion);
+      var unique = cantons.filter((v, i, a) => a.indexOf(v) === i);
+      $scope.cantons = unique;
+      if($scope.selectedCanton=="") $scope.selectedCanton = $scope.cantons[$scope.cantons.length-1];
+    }
+    let dataToUse = locationData.administered;
+    let filterDate = dataToUse[dataToUse.length-1].date;
+    dataToUse = dataToUse.filter(d=> d.geoRegion==$scope.selectedCanton && d.date==filterDate);
+    // $scope.series[0] = $scope.set==1?'Fälle':($scope.set==2?'Todesfälle':($scope.set==3?'Inzidenz':'Hospitalisierungen'));
+    // let index = dataToUse.length-6;
+    // if($scope.duration==2) index = dataToUse.findIndex(d=> d.date == "2020-05-31");
+    // else if($scope.duration==4) index = dataToUse.length-11;
+    // let firstData = dataToUse[index];
+    // let latestData = dataToUse[dataToUse.length-1];
+    for(var i=0; i<locations.length; i++) {
+      let label = locations[i];
+      let entry = dataToUse.filter(d => d.location==label);
+      let value = entry[0].prctSumTotal;
+      $scope.data[0][i] = value;
+    }
+    //$scope.options.scales.yAxes[0].ticks.suggestedMax = 100;
+    //$scope.options.plugins.datalabels = getDataLabels(true);
+
+    //var dataset = $scope.set==0?"Vollständig geimpfte Personen":$scope.set==1?"Impfdosen":"";
+    //var time = $scope.duration==1?"Ganze Pandemie":$scope.duration==2?"Ab Juni":$scope.duration==3?"Letzte 7 Tage":"Letzte 14 Tage";
+    var filterDateYear = parseInt(filterDate.substring(0,4));
+    var filterDateWeek = parseInt(filterDate.substring(4));
+    var monday = getDateOfISOWeek(filterDateWeek, filterDateYear);
+    var sunday = new Date(monday);
+    sunday.setDate(sunday.getDate()+6);
+    $scope.options.title.text = "Ortsverteilung der verabreichten Dosen bis "+formatDate(sunday); //+" "+time;
   }
 }]);
 
@@ -614,7 +738,7 @@ function formatDate(date) {
   return dd+"."+mm+"."+yy;
 }
 
-function getDataLabels(raw) {
+function getDataLabels(raw, withPercent) {
   return {
       color: inDarkMode() ? '#ccc' : 'black',
       font: {
@@ -625,7 +749,10 @@ function getDataLabels(raw) {
       formatter: function(value, context) {
         var sum = context.dataset.data.reduce( (acc, val) => acc+parseInt(val), 0);
         var percentage = Math.round(value / sum * 1000) / 10;
-        if(raw) return value;
+        if(raw) {
+          if(withPercent==true) return value+"%";
+          return value;
+        }
         return percentage+"%";
       }
   };

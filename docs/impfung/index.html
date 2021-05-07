@@ -104,6 +104,14 @@
           <tr><td>Tage bis Ziel erreicht:</td><td>{{daysTillGoal()}}</td></tr>
           <tr><td>Datum:</td><td>{{dateOfGoal()}}</td></tr>
         </table>
+        <div id="calculatorlocationcontrol">
+          <div class="rowdiv">
+            <span class="barChartControl barChartHeading cell">Kanton:</span>
+            <span class="cell">
+              <button class="barChartControl" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+            </span>
+          </div>
+        </div>
       </article>
     </section>
     </div>
@@ -112,7 +120,7 @@
 				<h2>Altersverteilung</h2>
 			</header>
       <article id="interactive" ng-controller="BarCtrl">
-        <canvas id="angularagecanvas" class="chart chart-base" chart-type="type" chart-data="data" chart-colors="colors" chart-labels="labels" chart-series="series" chart-options="options"></canvas>
+        <canvas id="angularagecanvas" class="agecanvas chart chart-base" chart-type="type" chart-data="data" chart-colors="colors" chart-labels="labels" chart-series="series" chart-options="options"></canvas>
         <div id="ageontrols">
           <div class="rowdiv">
             <span class="barChartControl barChartHeading cell">Kanton:</span>
@@ -126,6 +134,22 @@
               <button class="barChartControl" ng-click="dataset='full';update()" ng-class="dataset=='full'?'active':''">{{getName('full')}}</button>
               <button class="barChartControl" ng-click="dataset='doses';update()" ng-class="dataset=='doses'?'active':''">{{getName('doses')}}</button>
               <button class="barChartControl" ng-click="dataset='rawdoses';update()" ng-class="dataset=='rawdoses'?'active':''">{{getName('rawdoses')}}</button>
+            </span>
+          </div>
+        </div>
+      </article>
+    </section>
+    <section>
+      <header>
+				<h2>Impforte</h2>
+			</header>
+      <article id="locationdiv" ng-controller="LocationCtrl">
+        <canvas id="locationcanvas" class="agecanvas chart chart-base" chart-type="type" chart-data="data" chart-colors="colors" chart-labels="labels" chart-series="series" chart-options="options"></canvas>
+        <div id="locationcontrols">
+          <div class="rowdiv">
+            <span class="barChartControl barChartHeading cell">Kanton:</span>
+            <span class="cell">
+              <button class="barChartControl" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
             </span>
           </div>
         </div>
