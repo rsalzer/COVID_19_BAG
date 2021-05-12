@@ -157,6 +157,7 @@ function parseExcel() {
       sourceFile: 'temp.xlsx'
   });
   var deaths = result["COVID19 Altersverteilung TodF"];
+  if(deaths==null) deaths = result["COVID19 cas décédés sexe âge"];
   var data = deaths.splice(4,10);
 
   var deaths = [];
@@ -173,6 +174,7 @@ function parseExcel() {
   console.log(deaths);
 
   var hospit = result["COVID19 Altersverteilung Hospit"];
+  if(hospit==null) hospit = result["COVID19 cas hosp sexe âge"];
   data = hospit.splice(4,20);
 
   var hospitalised = [];
@@ -189,6 +191,7 @@ function parseExcel() {
   console.log(hospitalised);
 
   var casessheet = result["COVID19 Altersverteilung"];
+  if(casessheet==null) casessheet = result["COVID19 cas par sexe et âge"];
   data = casessheet.splice(5,20);
 
   var cases = [];
@@ -213,6 +216,7 @@ function parseExcel() {
   console.log(incidences);
 
   var isolation = result["COVID19 Isolation Quarantäne"];
+  if(isolation==null) isolation = result["COVID19 isolement quarantaine"];
   var isolationCSV = null;
   if(isolation) {
     data = isolation.splice(4,27);
@@ -234,6 +238,7 @@ function parseExcel() {
 
 
   var totals = result["COVID19 Zahlen"];
+  if(totals==null) totals = result["COVID19 chiffres"];
   data = totals.splice(5);
   var total = data.reduce(function(acc, val) { return acc + val.B; }, 0);
   console.log("BAG Total: "+total);
@@ -244,6 +249,7 @@ function parseExcel() {
   console.log("Date: " + date);
 
   var casesPerCantons = result["COVID19 Kantone"];
+  if(casesPerCantons==null) casesPerCantons = result["COVID19 cas par canton"];
   var data = casesPerCantons.splice(4,29);
 
   var dateObj = {};
@@ -359,6 +365,7 @@ function parseCases(today, yday) {
     sourceFile: '../bagfiles/'+yday
   });
   var cases = result["COVID19 Zahlen"];
+  if(cases==null) cases = result["COVID19 chiffres"];
   var data = cases.splice(5);
   //var ydata = yesterday["COVID19 Zahlen"].splice(5);
   var csv = "date,new_cases,total_cases,new_hosp,total_hosp,new_deaths,total_deaths";
