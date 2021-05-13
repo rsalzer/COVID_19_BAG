@@ -191,8 +191,12 @@ function parseExcel() {
   console.log(hospitalised);
 
   var casessheet = result["COVID19 Altersverteilung"];
-  if(casessheet==null) casessheet = result["COVID19 cas par sexe et âge"];
-  data = casessheet.splice(5,20);
+  if(casessheet==null) {
+    casessheet = result["COVID19 cas par sexe et âge"];
+    data = casessheet.splice(4,20);
+  }
+  else
+    data = casessheet.splice(5,20);
 
   var cases = [];
   var incidences = [];
@@ -238,7 +242,11 @@ function parseExcel() {
 
 
   var totals = result["COVID19 Zahlen"];
-  if(totals==null) totals = result["COVID19 chiffres"];
+  var french = false;
+  if(totals==null) {
+    totals = result["COVID19 chiffres"];
+    french = true;
+  }
   data = totals.splice(5);
   var total = data.reduce(function(acc, val) { return acc + val.B; }, 0);
   console.log("BAG Total: "+total);
@@ -246,6 +254,9 @@ function parseExcel() {
   var dateString = totals[0].A
   var length = dateString.length;;
   var date = dateString.substring(length-20,length-10);
+  if(french) {
+    date = dateString.substring(length-18,length-8);
+  }
   console.log("Date: " + date);
 
   var casesPerCantons = result["COVID19 Kantone"];
