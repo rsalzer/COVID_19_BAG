@@ -145,10 +145,10 @@ var locationData = {};
 function getBAGMetaData() {
   var url = 'https://www.covid19.admin.ch/api/data/context';
   d3.json(url, function(error, jsondata) {
-    var fullVaccUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.fullyVaccPersons;
+    var fullVaccUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccPersons;
     var administeredUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccDosesAdministered;
     var locationUrl = jsondata.sources.individual.csv.weeklyVacc.byLocation.vaccDosesAdministered;
-    var fullVaccUrl = jsondata.sources.individual.csv.fullyVaccPersons;
+    var fullVaccUrl = jsondata.sources.individual.csv.vaccPersons;
     var administeredUrl = jsondata.sources.individual.csv.vaccDosesAdministered;
     var deliveredUrl = jsondata.sources.individual.csv.vaccDosesDelivered;
     getBAGData('full', fullVaccUrl, verlaufData);
@@ -201,7 +201,7 @@ function processActualData(mode, chosenDay) {
   let dateSpan = document.getElementById("dateSpan");
   dateSpan.innerHTML = latestDay;
   let todaysData = data.filter(d => d.date == latestDay);
-  let fullData = verlaufData.full.filter(d => d.date==latestDay);
+  let fullData = verlaufData.full.filter(d => d.date==latestDay&&d.type=="COVID19FullyVaccPersons");
   let firstDay =  "2021-01-24"; //"2021-02-14";
   let firstDayData = data.filter(d=> d.date == firstDay);
   let table = document.getElementById("impftabelle");
@@ -458,7 +458,7 @@ app.controller('BarCtrl', ['$scope', function ($scope) {
     }
     let dataToUse;
     if($scope.dataset=="full") {
-      dataToUse = ageData.full;
+      dataToUse = ageData.full.filter(d=>d.type=="COVID19FullyVaccPersons");
     }
     if($scope.dataset=="doses" || $scope.dataset=="rawdoses") {
       dataToUse = ageData.administered;
@@ -565,7 +565,7 @@ app.controller('LocationCtrl', ['$scope', function ($scope) {
     for(var i=0; i<locations.length; i++) {
       let label = locations[i];
       let entry = dataToUse.filter(d => d.location==label);
-      let value = entry[0].prctSumTotal;
+      let value = Math.round(parseFloat(entry[0].prctSumTotal)*10)/10;
       $scope.data[0][i] = value;
     }
     //$scope.options.scales.yAxes[0].ticks.suggestedMax = 100;
