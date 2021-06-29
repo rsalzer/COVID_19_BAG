@@ -489,4 +489,5 @@ date,abbreviation_canton_and_fl,ncumul_conf,ncumul_deceased,current_hosp,current
 2021-06-25,AR,3904,64,1,0,
 2021-06-26,AR,3905,64,1,0,
 2021-06-27,AR,3905,64,1,0,
-2021-06-28,AR,3905,64,,,
+2021-06-28,AR,3905,64,1,1,
+2021-06-29,AR,3905,64,,,
