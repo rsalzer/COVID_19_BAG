@@ -3,7 +3,8 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-06-29,AI,0,0,2
 2021-06-29,AR,5,10,7
 2021-06-29,BE,86,433,153
-2021-06-29,BL,20,43,112
+2021-06-30,BL,20,35,111
+2021-06-30,BS,25,29,102
 2021-06-29,FL,16,4,12
 2021-06-29,FR,29,29,117
 2021-06-29,GE,76,36,431
@@ -12,7 +13,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-06-29,JU,8,20,0
 2021-06-29,LU,43,55,100
 2021-06-29,NE,15,40,75
-2021-06-29,OW,5,3,13
+2021-06-30,OW,4,3,10
 2021-06-29,SG,37,29,93
 2021-06-29,SH,15,17,10
 2021-06-29,SO,43,91,90
@@ -20,4 +21,5 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-06-29,TG,30,74,77
 2021-06-29,VD,100,126,493
 2021-06-29,VS,43,28,210
+2021-06-30,ZG,15,35,128
 2021-06-29,ZH,119,294,Keine aktuellen Daten gemeldet
