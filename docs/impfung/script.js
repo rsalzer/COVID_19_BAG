@@ -145,10 +145,10 @@ var locationData = {};
 function getBAGMetaData() {
   var url = 'https://www.covid19.admin.ch/api/data/context';
   d3.json(url, function(error, jsondata) {
-    var fullVaccUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccPersons;
+    var fullVaccUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccPersonsV2;
     var administeredUrlAge = jsondata.sources.individual.csv.weeklyVacc.byAge.vaccDosesAdministered;
     var locationUrl = jsondata.sources.individual.csv.weeklyVacc.byLocation.vaccDosesAdministered;
-    var fullVaccUrl = jsondata.sources.individual.csv.vaccPersons;
+    var fullVaccUrl = jsondata.sources.individual.csv.vaccPersonsV2;
     var administeredUrl = jsondata.sources.individual.csv.vaccDosesAdministered;
     var deliveredUrl = jsondata.sources.individual.csv.vaccDosesDelivered;
     getBAGData('full', fullVaccUrl, verlaufData);
@@ -451,7 +451,7 @@ app.controller('BarCtrl', ['$scope', function ($scope) {
 
   $scope.update = function() {
     if($scope.cantons.length==0) {
-      var cantons = ageData.full.map(d=>d.geoRegion);
+      var cantons = ageData.full.filter(d=>d.geoRegion.length<3).map(d=>d.geoRegion);
       var unique = cantons.filter((v, i, a) => a.indexOf(v) === i);
       $scope.cantons = unique;
       if($scope.selectedCanton=="") $scope.selectedCanton = $scope.cantons[0];
