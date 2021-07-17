@@ -57,6 +57,9 @@ case 'tweet':
     console.log('Testing tweet');
     tweet("#COVID_19 #COVID19 #CoronaInfoCH #Coronavirus\n🇨🇭BAG-Data from today: +XX\nBE: +X\rZH +X");
     break;
+case 'testbag':
+    console.log('Testing BAG-Download');
+    arDownload.start(['AR','VD']);
 default:
     console.log('Sorry, that is not something I know how to do.');
     rl.close();
@@ -343,7 +346,7 @@ function parseExcel() {
           console.log('\x1b[42m%s\x1b[0m', 'Successfully renamed temp.xlsx - AKA moved!')
 
           tweetNewNumbers();
-          arDownload.start();
+          arDownload.start(['AR','VD']);
           listFiles();
         });
     });

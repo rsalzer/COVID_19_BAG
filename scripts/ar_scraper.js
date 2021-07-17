@@ -6,18 +6,20 @@ const readline = require("readline");
 
 //const cantons = ['AG', 'AI', 'AR', 'BE', 'BL', 'BS', 'FR', 'GE', 'GL', 'GR', 'JU', 'LU', 'NE', 'NW', 'OW', 'SG', 'SH', 'SO', 'SZ', 'TG', 'TI', 'UR', 'VD', 'VS', 'ZG', 'ZH', 'FL'];
 const bagMetaLocation = "https://www.covid19.admin.ch/api/data/context";
+let whichCantons;
 
-const startARDownload = () => {
-  downloadJSON(bagMetaLocation);
+const startARDownload = (cantons) => {
+  whichCantons = cantons;
+  downloadJSON();
 }
 
 exports.start = startARDownload;
 //startARDownload();
 
-  function downloadJSON(source) {
+  function downloadJSON() {
   var metaJson;
   var data="";
-  https.get(source,(res) => {
+  https.get(bagMetaLocation,(res) => {
       let body = "";
 
       res.on("data", (chunk) => {
@@ -71,66 +73,71 @@ async function downloadFiles(list) {
 
 async function finishedSingleDownload(body, whichData, list) {
   var json = await csv().fromString(body);
-  json = json.filter(d => d.geoRegion=="AR");
-  if(whichData!="hospCapacity") {
-    json = json.map(d => {
-      var obj = {};
-      obj.date = d.datum;
-      obj[whichData] = d.sumTotal;
-      return obj;
-    });
-  }
-  else {
-    json = json.map(d => {
-      var obj = {};
-      obj.date = d.date;
-      obj.current_hosp = d.Total_Covid19Patients;
-      obj.current_icu = d.ICU_Covid19Patients;
-      return obj;
-    });
-  }
-  data[whichData] = json;
+  whichCantons.forEach((whichCanton) => {
+    if(!data[whichCanton]) data[whichCanton] = {};
+    var filtered = json.filter(d => d.geoRegion==whichCanton);
+    if(whichData!="hospCapacity") {
+      filtered = filtered.map(d => {
+        var obj = {};
+        obj.date = d.datum;
+        obj[whichData] = d.sumTotal;
+        return obj;
+      });
+    }
+    else {
+      filtered = filtered.map(d => {
+        var obj = {};
+        obj.date = d.date;
+        obj.current_hosp = d.Total_Covid19Patients;
+        obj.current_icu = d.ICU_Covid19Patients;
+        return obj;
+      });
+    }
+    data[whichCanton][whichData] = filtered;
+  });
   downloadFiles(list);
 }
 
 function finishedDownloading() {
   console.log("Finished Downloading");
-  var consolidated = data.ncumul_conf;
-  data.ncumul_deceased.forEach((item, i) => {
-    var date = item.date;
-    var deaths = item.ncumul_deceased;
-    var filtered = consolidated.filter(d => d.date==date);
-    if(filtered.length==0) {
-      consolidated.push(item);
-    }
-    else {
-      filtered[0].ncumul_deceased = deaths;
-    }
+  whichCantons.forEach((whichCanton) => {
+    var singleData = data[whichCanton];
+    var consolidated = singleData.ncumul_conf;
+    singleData.ncumul_deceased.forEach((item, i) => {
+      var date = item.date;
+      var deaths = item.ncumul_deceased;
+      var filtered = consolidated.filter(d => d.date==date);
+      if(filtered.length==0) {
+        consolidated.push(item);
+      }
+      else {
+        filtered[0].ncumul_deceased = deaths;
+      }
+    });
+
+    singleData.hospCapacity.forEach((item, i) => {
+      var date = item.date;
+      var filtered = consolidated.filter(d => d.date==date);
+      if(filtered.length==0) {
+        consolidated.push(item);
+      }
+      else {
+        filtered[0].current_hosp = item.current_hosp;
+        filtered[0].current_icu = item.current_icu;
+      }
+    });
+
+    var csvtext = "date,abbreviation_canton_and_fl,ncumul_conf,ncumul_deceased,current_hosp,current_icu,current_vent";
+    consolidated.forEach((item, i) => {
+      var line = `\n${item.date},${whichCanton},${item.ncumul_conf},${item.ncumul_deceased},${item.current_hosp},${item.current_icu},`;
+      line = line.split("undefined").join("")
+      line = line.split("NA").join("");
+      csvtext += line;
+    });
+
+    console.log(csvtext);
+
+    fs.writeFileSync(`../data/${whichCanton.toLowerCase()}.csv`, csvtext);
   });
-
-  data.hospCapacity.forEach((item, i) => {
-    var date = item.date;
-    var filtered = consolidated.filter(d => d.date==date);
-    if(filtered.length==0) {
-      consolidated.push(item);
-    }
-    else {
-      filtered[0].current_hosp = item.current_hosp;
-      filtered[0].current_icu = item.current_icu;
-    }
-  });
-
-  var csvtext = "date,abbreviation_canton_and_fl,ncumul_conf,ncumul_deceased,current_hosp,current_icu,current_vent";
-  consolidated.forEach((item, i) => {
-    var line = `\n${item.date},AR,${item.ncumul_conf},${item.ncumul_deceased},${item.current_hosp},${item.current_icu},`;
-    line = line.split("undefined").join("")
-    line = line.split("NA").join("");
-    csvtext += line;
-  });
-
-  //console.log(csvtext);
-
-  fs.writeFileSync('../data/ar.csv', csvtext);
-
 
 }
