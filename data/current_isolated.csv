@@ -3,7 +3,6 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-07-29,AI,6,1,2
 2021-07-29,AR,6,7,7
 2021-07-29,BE,347,657,73
-2021-07-29,BL,188,134,68
 2021-07-29,FL,21,10,7
 2021-07-29,FR,113,80,40
 2021-07-29,GE,1155,520,88
@@ -14,11 +13,11 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-07-29,OW,22,21,11
 2021-07-29,SG,206,163,70
 2021-07-29,SH,39,28,3
-2021-07-29,SO,134,74,9
+2021-07-30,SO,150,209,26
 2021-07-29,SZ,100,76,23
 2021-07-29,TG,98,104,32
 2021-07-29,TI,198,364,20
-2021-07-29,VD,731,501,185
+2021-07-30,VD,751,571,180
 2021-07-29,VS,180,294,65
 2021-07-29,ZG,66,76,29
 2021-07-29,ZH,1137,2341,Keine aktuellen Daten gemeldet
