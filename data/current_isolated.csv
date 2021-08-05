@@ -3,7 +3,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-08-03,AI,4,0,Keine aktuellen Daten gemeldet
 2021-08-03,AR,6,7,7
 2021-08-03,BE,455,801,94
-2021-08-03,BL,236,132,77
+2021-08-04,BL,258,133,61
 2021-08-03,FL,19,11,10
 2021-08-03,FR,96,96,90
 2021-08-03,GE,1097,518,67
@@ -11,6 +11,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-08-03,GR,178,188,16
 2021-08-03,LU,327,180,50
 2021-08-03,NE,107,71,21
+2021-08-04,OW,24,19,10
 2021-08-03,SG,207,213,79
 2021-08-03,SH,45,28,2
 2021-08-03,SO,179,248,18
