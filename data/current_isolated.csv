@@ -3,13 +3,15 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-09-23,AI,35,17,0
 2021-09-23,AR,107,40,0
 2021-09-23,BE,1824,2322,0
-2021-09-23,BL,331,421,0
+2021-09-24,BL,335,412,0
 2021-09-23,BS,266,181,0
 2021-09-23,FL,44,32,0
 2021-09-23,GE,824,484,0
+2021-09-24,GL,117,78,0
 2021-09-23,GR,265,463,Keine aktuellen Daten gemeldet
 2021-09-23,LU,1133,1270,Keine aktuellen Daten gemeldet
 2021-09-23,NE,227,295,0
+2021-09-24,OW,130,176,0
 2021-09-23,SG,904,591,0
 2021-09-23,SH,99,118,0
 2021-09-23,SO,310,674,0
@@ -19,4 +21,5 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-09-23,UR,80,123,0
 2021-09-23,VD,1117,1301,Keine aktuellen Daten gemeldet
 2021-09-23,VS,444,442,0
+2021-09-25,ZG,140,152,0
 2021-09-23,ZH,2579,Keine aktuellen Daten gemeldet,Keine aktuellen Daten gemeldet
