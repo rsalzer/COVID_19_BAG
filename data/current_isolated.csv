@@ -1,26 +1,27 @@
 date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_quarantined
-2021-10-14,AG,429,302,0
-2021-10-14,AI,25,5,0
-2021-10-14,AR,69,39,0
-2021-10-14,BE,505,356,0
-2021-10-15,BL,158,84,0
-2021-10-14,BS,82,57,0
-2021-10-14,FL,24,13,0
-2021-10-14,FR,219,253,0
-2021-10-15,GE,547,312,Keine aktuellen Daten gemeldet
-2021-10-14,GL,26,18,0
-2021-10-14,GR,207,432,0
-2021-10-14,JU,30,41,Keine aktuellen Daten gemeldet
-2021-10-14,LU,755,534,0
-2021-10-14,NE,151,104,0
-2021-10-18,NW,81,53,0
-2021-10-15,OW,99,81,0
-2021-10-14,SG,571,241,0
-2021-10-14,SH,40,33,0
-2021-10-14,SO,124,255,0
-2021-10-14,TG,300,389,0
-2021-10-14,TI,119,244,Keine aktuellen Daten gemeldet
-2021-10-14,VD,585,606,Keine aktuellen Daten gemeldet
-2021-10-14,VS,280,366,0
-2021-10-14,ZG,61,53,0
-2021-10-14,ZH,1113,Keine aktuellen Daten gemeldet,Keine aktuellen Daten gemeldet
+2021-10-19,AG,389,263,0
+2021-10-19,AI,35,9,0
+2021-10-19,AR,90,27,0
+2021-10-19,BE,525,430,0
+2021-10-19,BL,172,107,0
+2021-10-19,BS,107,63,0
+2021-10-19,FL,39,15,0
+2021-10-19,FR,249,285,0
+2021-10-19,GE,595,392,0
+2021-10-19,GL,31,24,0
+2021-10-19,GR,209,457,0
+2021-10-19,JU,25,39,Keine aktuellen Daten gemeldet
+2021-10-19,LU,644,495,Keine aktuellen Daten gemeldet
+2021-10-19,NE,128,88,0
+2021-10-19,NW,86,51,2
+2021-10-19,SG,629,258,0
+2021-10-19,SH,54,34,0
+2021-10-19,SO,120,251,0
+2021-10-19,SZ,397,186,0
+2021-10-19,TG,212,268,0
+2021-10-19,TI,116,266,Keine aktuellen Daten gemeldet
+2021-10-19,UR,67,47,0
+2021-10-19,VD,678,625,Keine aktuellen Daten gemeldet
+2021-10-19,VS,258,209,0
+2021-10-19,ZG,74,68,0
+2021-10-19,ZH,981,Keine aktuellen Daten gemeldet,Keine aktuellen Daten gemeldet
