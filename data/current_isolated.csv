@@ -3,7 +3,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-11-11,AI,72,40,0
 2021-11-12,AR,300,161,0
 2021-11-11,BE,2404,1673,0
-2021-11-12,BL,896,687,0
+2021-11-15,BL,973,764,0
 2021-11-11,FL,123,120,0
 2021-11-11,FR,377,352,0
 2021-11-11,GE,916,337,0
@@ -13,6 +13,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2021-11-11,LU,1414,1487,Keine aktuellen Daten gemeldet
 2021-11-11,NE,223,267,0
 2021-11-11,NW,258,199,6
+2021-11-15,OW,146,87,16
 2021-11-12,SG,2292,1395,0
 2021-11-11,SH,75,101,0
 2021-11-11,SO,715,1510,0
