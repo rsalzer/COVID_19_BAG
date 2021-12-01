@@ -1,25 +1,27 @@
 date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_quarantined
-2021-11-25,AG,3098,1028,0
-2021-11-25,AI,112,77,0
-2021-11-25,AR,387,236,0
-2021-11-25,BE,4854,2453,0
-2021-11-29,BL,1953,1125,0
-2021-11-25,BS,1277,548,0
-2021-11-25,FL,390,432,Keine aktuellen Daten gemeldet
-2021-11-25,FR,1208,1202,Keine aktuellen Daten gemeldet
-2021-11-25,GE,2291,941,0
-2021-11-25,GL,292,135,0
-2021-11-25,GR,1798,1616,Keine aktuellen Daten gemeldet
-2021-11-25,LU,2860,3876,Keine aktuellen Daten gemeldet
-2021-11-25,NE,584,481,0
-2021-11-26,OW,242,45,0
-2021-11-25,SG,3385,1974,0
-2021-11-25,SH,469,408,0
-2021-11-25,SO,1560,3038,0
-2021-11-25,SZ,1639,1925,0
-2021-11-25,TG,2437,3331,Keine aktuellen Daten gemeldet
-2021-11-25,TI,727,1299,Keine aktuellen Daten gemeldet
-2021-11-25,UR,313,124,0
-2021-11-25,VD,3391,2576,0
-2021-11-26,ZG,699,421,0
-2021-11-25,ZH,7410,Keine aktuellen Daten gemeldet,Keine aktuellen Daten gemeldet
+2021-11-30,AG,1265,968,0
+2021-11-30,AI,92,70,0
+2021-11-30,AR,396,265,29
+2021-11-30,BE,4458,2046,4
+2021-11-30,BL,2084,1253,0
+2021-11-30,FL,366,449,Keine aktuellen Daten gemeldet
+2021-11-30,FR,1507,1728,Keine aktuellen Daten gemeldet
+2021-11-30,GE,3516,1043,9
+2021-11-30,GL,310,112,2
+2021-11-30,GR,1801,1475,0
+2021-11-30,JU,383,717,Keine aktuellen Daten gemeldet
+2021-11-30,LU,3247,5001,Keine aktuellen Daten gemeldet
+2021-11-30,NE,603,402,0
+2021-11-30,NW,298,147,4
+2021-11-30,OW,169,48,0
+2021-11-30,SG,3364,2254,Keine aktuellen Daten gemeldet
+2021-11-30,SH,502,442,6
+2021-11-30,SO,1705,3600,10
+2021-11-30,SZ,1430,1769,28
+2021-11-30,TG,2627,3875,113
+2021-11-30,TI,787,1162,Keine aktuellen Daten gemeldet
+2021-11-30,UR,328,132,2
+2021-11-30,VD,4341,3197,Keine aktuellen Daten gemeldet
+2021-11-30,VS,1619,1033,412
+2021-11-30,ZG,707,414,0
+2021-11-30,ZH,7035,Keine aktuellen Daten gemeldet,Keine aktuellen Daten gemeldet
