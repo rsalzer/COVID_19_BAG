@@ -59,8 +59,10 @@ const population = {
   "VS": 345525,
   "ZG": 127642,
   "ZH": 1539275,
-  "FL": 38747
+  "FL": 38747,
+  "CHFL": 8644780
 };
+
 const names = {
   "CH": "Ganze Schweiz",
   "CHFL": "Schweiz + Liechtenstein",
@@ -202,6 +204,7 @@ function processActualData(mode, chosenDay) {
   dateSpan.innerHTML = latestDay;
   let todaysData = data.filter(d => d.date == latestDay);
   let fullData = verlaufData.full.filter(d => d.date==latestDay&&d.type=="COVID19FullyVaccPersons");
+  let boosteredData = verlaufData.full.filter(d => d.date==latestDay&&d.type=="COVID19FirstBoosterPersons");
   let firstDay =  "2021-01-24"; //"2021-02-14";
   let firstDayData = data.filter(d=> d.date == firstDay);
   let table = document.getElementById("impftabelle");
@@ -253,6 +256,8 @@ function processActualData(mode, chosenDay) {
     }
     let lastDayFilteredByCanton = todaysData.filter(d => d.geoRegion == canton)[0];
     let full = fullData.filter(d => d.geoRegion == canton)[0];
+    console.log(full);
+    let boostered = boosteredData.filter(d => d.geoRegion == canton)[0];
     let firstDayFilteredByCanton = firstDayData.filter(d => d.geoRegion == canton)[0];
     let vaccLast = parseFloat(lastDayFilteredByCanton.sumTotal);
     let averagePerDay = (vaccLast - parseFloat(firstDayFilteredByCanton.sumTotal)) / daysDifference;
@@ -279,10 +284,12 @@ function processActualData(mode, chosenDay) {
     tr.innerHTML = `
       <td><a class='flag ${canton}' href='#detail_${canton}'>${canton}</a></td>
       <td class="total">${vaccLast.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
-      <td class="total">${lastDayFilteredByCanton.per100PersonsTotal}%</td>
       <td class="total">${full.sumTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
       <td class="total">${full.per100PersonsTotal}%</td>
+      <td class="total">${boostered.sumTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
+      <td class="total">${boostered.per100PersonsTotal}%</td>
     `;
+    //<td class="total">${lastDayFilteredByCanton.per100PersonsTotal}%</td>
     //<td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
     // <td class="total">${days65}</td>
     // <td class="total leftalign">(${date65String})</td>
@@ -431,9 +438,9 @@ app.controller('BarCtrl', ['$scope', function ($scope) {
     backgroundColor: ["#2c6a69", "#369381", "#4cb286", "#68c880", "#86d475", "#a1d76c", "#b3d16d", "#b8c17f", "#b7bf82"]
   }];
   $scope.cantons = [];
-  $scope.selectedCanton = "";
+  $scope.selectedCanton = "CH";
   $scope.set = 1;
-  $scope.dataset = "full";
+  $scope.dataset = "booster";
 
   $scope.selectCanton = function(canton) {
     $scope.selectedCanton = canton;
@@ -445,6 +452,7 @@ app.controller('BarCtrl', ['$scope', function ($scope) {
       case "full": return "Vollständig Geimpft pro 100 Personen";
       case "doses": return "Verimpfte Dosen pro 100 Personen";
       case "rawdoses": return "Verimpfte Dosen";
+      case "booster": return "Geboostert pro 100 Personen"
       default: return "";
     }
   }
@@ -460,8 +468,11 @@ app.controller('BarCtrl', ['$scope', function ($scope) {
     if($scope.dataset=="full") {
       dataToUse = ageData.full.filter(d=>d.type=="COVID19FullyVaccPersons");
     }
-    if($scope.dataset=="doses" || $scope.dataset=="rawdoses") {
+    else if($scope.dataset=="doses" || $scope.dataset=="rawdoses") {
       dataToUse = ageData.administered;
+    }
+    else if($scope.dataset == "booster") {
+      dataToUse = ageData.full.filter(d=>d.type=="COVID19FirstBoosterPersons");
     }
     let filterDate = dataToUse[dataToUse.length-1].date;
     dataToUse = dataToUse.filter(d=> d.geoRegion==$scope.selectedCanton && d.date==filterDate);

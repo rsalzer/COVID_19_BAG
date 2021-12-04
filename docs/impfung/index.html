@@ -44,8 +44,6 @@
 			<div class="notes">
 				<p>Die Bevölkerungszahlen basieren auf den Daten des BFS (ständige Wohnbevölkerung) per Ende 2019.<br/>
           Der Durchschnitt pro Tag wird ab der ersten Publikation der Impfdaten (21.1.2021) gerechnet.<br/>
-          <b>Achtung: Diese Zahlen des BAG sind mit Vorsicht zu interpretieren.<br/>
-          % der Bevölkerung bezieht sich auf einzelne Dosen. Mit den aktuellen Vakzinen braucht es 2 Dosen pro Person.</b></p>
 			</div>
 		</header>
 
@@ -62,9 +60,11 @@
             <tr>
               <th><span>Kanton</span></th>
               <th class="total"><span>Verimpfte Dosen</span></th>
-              <th class="total"><span>% der Bevölkerung</span></th>
+              <!-- <th class="total"><span>% der Bevölkerung</span></th> -->
               <!-- <th class="total"><span>Ø pro Tag</span></th> -->
               <th class="total"><span>Vollständig geimpft</span></th>
+              <th class="total"><span>% der Bevölkerung</span></th>
+              <th class="total"><span>Geboostert</span></th>
               <th class="total"><span>% der Bevölkerung</span></th>
               <!-- <th class="total"><span>Tage bis 65% (2 Dosen)</span></th>
               <th></th>
@@ -134,6 +134,7 @@
               <button class="barChartControl" ng-click="dataset='full';update()" ng-class="dataset=='full'?'active':''">{{getName('full')}}</button>
               <button class="barChartControl" ng-click="dataset='doses';update()" ng-class="dataset=='doses'?'active':''">{{getName('doses')}}</button>
               <button class="barChartControl" ng-click="dataset='rawdoses';update()" ng-class="dataset=='rawdoses'?'active':''">{{getName('rawdoses')}}</button>
+              <button class="barChartControl" ng-click="dataset='booster';update()" ng-class="dataset=='booster'?'active':''">{{getName('booster')}}</button>
             </span>
           </div>
         </div>
