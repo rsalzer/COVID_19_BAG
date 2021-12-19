@@ -131,7 +131,6 @@ getBAGMetaData();
 
 function processData() {
   processActualData(null, null);
-  processSpeedData();
   var angularDiv = document.getElementById("interactive2");
   var scope = angular.element(angularDiv).scope()
   scope.update();
@@ -172,7 +171,6 @@ function getBAGData(name, url, dataobject) {
         if(Object.keys(verlaufData).length==2 && Object.keys(ageData).length==2 && Object.keys(locationData).length==1) {
            processData();
            processAgeData();
-           processLocationData();
          }
        }
   });
@@ -180,13 +178,6 @@ function getBAGData(name, url, dataobject) {
 
 function processAgeData() {
   var angularDiv = document.getElementById("interactive");
-  var scope = angular.element(angularDiv).scope()
-  scope.update();
-  scope.$apply();
-}
-
-function processLocationData() {
-  var angularDiv = document.getElementById("locationdiv");
   var scope = angular.element(angularDiv).scope()
   scope.update();
   scope.$apply();
@@ -256,7 +247,7 @@ function processActualData(mode, chosenDay) {
     }
     let lastDayFilteredByCanton = todaysData.filter(d => d.geoRegion == canton)[0];
     let full = fullData.filter(d => d.geoRegion == canton)[0];
-    console.log(full);
+    //console.log(full);
     let boostered = boosteredData.filter(d => d.geoRegion == canton)[0];
     let firstDayFilteredByCanton = firstDayData.filter(d => d.geoRegion == canton)[0];
     let vaccLast = parseFloat(lastDayFilteredByCanton.sumTotal);
@@ -300,108 +291,7 @@ function processActualData(mode, chosenDay) {
   }
 }
 
-function processSpeedData() {
-  var data = verlaufData.administered;
-  let latestDay = data[data.length-1].date;
-  let todaysData = data.filter(d => d.date == latestDay);
-  let firstDay =  "2021-01-24"; //"2021-02-14";
-  let firstDayData = data.filter(d=> d.date == firstDay);
-  let latestDayDate = stringToDate(latestDay);
-  let firstDayDate = stringToDate(firstDay);
-  let daysDifference = (latestDayDate.getTime() - firstDayDate.getTime()) / (1000 * 60 * 60 * 24);
-  let table = document.getElementById("speedtabelle");
-  table.innerHTML = "";
-  for(var i=0; i<cantons.length; i++) {
-    let canton = cantons[i];
-    var days = 0;
-    let lastDayFilteredByCanton = todaysData.filter(d => d.geoRegion == canton)[0];
-
-    let firstDayFilteredByCanton = firstDayData.filter(d => d.geoRegion == canton)[0];
-    let vaccLast = parseFloat(lastDayFilteredByCanton.sumTotal);
-    let averagePerDay = (vaccLast - parseFloat(firstDayFilteredByCanton.sumTotal)) / daysDifference;
-    let dataWithAverages = data.filter(d => d.geoRegion == canton && d.mean7d!="NA");
-    let averageLast7Days = dataWithAverages[dataWithAverages.length-1].mean7d;
-    let averagePerDayPer100 = Math.round(averagePerDay*100*100/population[canton])/100;
-    let averageLast7DaysPer100 = Math.round(averageLast7Days*100*100/population[canton])/100;
-    //if(canton=="CH") averagePerDay = 40501;
-    // let pop30 = population[canton]*0.3 * 2;
-    // let pop65 = population[canton]*0.65 * 2; //we need 2 doses per person ...
-    // let pop80 = population[canton]*0.8 * 2;//we need 2 doses per person ...
-    // let days30 = Math.round((pop30 - vaccLast) / averagePerDay);
-    // let milis30 = latestDayDate.getTime() + days30 * (1000 * 60 * 60 * 24);
-    // let date30 = new Date(milis30);
-    // let date30String = date30.toISOString().substring(0,7);
-    // console.log(canton+": "+date30String);
-    // let days65 = Math.round((pop65 - vaccLast) / averagePerDay);
-    // let milis65 = latestDayDate.getTime() + days65 * (1000 * 60 * 60 * 24);
-    // let date65 = new Date(milis65);
-    // let date65String = date65.toISOString().substring(0,7);
-    // let days80 = Math.round((pop80 - vaccLast) / averagePerDay);
-    // let milis80 = latestDayDate.getTime() + days80 * (1000 * 60 * 60 * 24);
-    // let date80 = new Date(milis80);
-    // let date80String = date80.toISOString().substring(0,7);
-    if(lastDayFilteredByCanton==null) return;
-    //console.log(filteredForCanton);
-    var tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><a class='flag ${canton}' href='#detail_${canton}'>${canton}</a></td>
-      <td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
-      <td>${averagePerDayPer100}%</td>
-      <td class="total">${Math.round(averageLast7Days).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
-      <td>${averageLast7DaysPer100}%</td>
-    `;
-    //<td class="total">${Math.round(averagePerDay).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’")}</td>
-    // <td class="total">${days65}</td>
-    // <td class="total leftalign">(${date65String})</td>
-    // <td class="total">${days80}</td>
-    // <td class="total leftalign">(${date80String})</td>
-
-    table.appendChild(tr);
-  }
-  putDataInCalculator();
-}
-
-function putDataInCalculator() {
-  var angularDiv = document.getElementById("calculator");
-  var scope = angular.element(angularDiv).scope()
-  scope.dateNow = latestDayDate;
-  scope.selectCanton("CH");
-  scope.$apply();
-}
-
 var app = angular.module('vaccinations', ['chart.js']);
-
-app.controller('SpeedCtrl', ['$scope', function ($scope) {
-  $scope.dateNow = 0;
-  $scope.dosesTillNow = 0;
-  $scope.population = population['CH'];
-  $scope.percent = 85;
-  $scope.dosesNeeded = function() {
-    return Math.ceil($scope.population*2*$scope.percent/100-$scope.dosesTillNow);
-  }
-  $scope.dosesPerDay = 10000;
-  $scope.daysTillGoal = function() {
-    return Math.round($scope.dosesNeeded()/$scope.dosesPerDay);
-  };
-  $scope.dateOfGoal = function() {
-    if($scope.dateNow==0) return 0;
-    var dateOfGoal = new Date($scope.dateNow.getTime() + $scope.daysTillGoal() * (1000 * 60 * 60 * 24));
-    return formatDate(dateOfGoal);
-  };
-  $scope.cantons = cantons;
-  $scope.selectedCanton = "CH";
-  $scope.selectCanton = function(canton) {
-    $scope.selectedCanton = canton;
-    $scope.population = population[canton];
-    let dataWithAverages = verlaufData.administered.filter(d => d.geoRegion == canton && d.mean7d!="NA");
-    let averageLast7Days = dataWithAverages[dataWithAverages.length-1].mean7d;
-    let latestDay = verlaufData.administered[verlaufData.administered.length-1].date;
-    let todaysData = verlaufData.administered.filter(d => d.date == latestDay && d.geoRegion == canton)[0];
-    $scope.dosesPerDay = Math.round(averageLast7Days);
-    $scope.dosesTillNow = todaysData.sumTotal;
-    $scope.$apply();
-  }
-}]);
 
 app.controller('BarCtrl', ['$scope', function ($scope) {
   $scope.type = "bar";
@@ -500,96 +390,7 @@ app.controller('BarCtrl', ['$scope', function ($scope) {
     var monday = getDateOfISOWeek(filterDateWeek, filterDateYear);
     var sunday = new Date(monday);
     sunday.setDate(sunday.getDate()+6);
-    $scope.options.title.text = "Altersverteilung "+$scope.getName($scope.dataset)+" bis "+formatDate(sunday); //+" "+time;
-  }
-}]);
-
-app.controller('LocationCtrl', ['$scope', function ($scope) {
-  $scope.type = "bar";
-  $scope.options = {
-    legend: { display: false },
-    tooltips: {
-        intersect: false
-    },
-    title: {
-        display: true,
-        text: "Ortsverteilung",
-        padding: 15
-    },
-    plugins: {
-      datalabels: getDataLabels(true, true)
-    },
-    scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true,
-            //suggestedMax: 100
-          },
-          gridLines: {
-              color: inDarkMode() ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'
-          }
-        }]
-    }
-  };
-  $scope.labels = locations.map(d=>locationTexts[d]);
-  $scope.data = [
-    [10,0,0,0,0,0]
-  ];
-  $scope.colors = [{
-    backgroundColor: ["#2c6a69", "#369381", "#4cb286", "#68c880", "#86d475", "#a1d76c", "#b3d16d", "#b8c17f", "#b7bf82"]
-  }];
-  $scope.cantons = [];
-  $scope.selectedCanton = "";
-  $scope.set = 1;
-  $scope.dataset = "full";
-
-  $scope.selectCanton = function(canton) {
-    $scope.selectedCanton = canton;
-    $scope.update();
-  }
-
-  $scope.getName = function(dataset) {
-    switch (dataset) {
-      case "full": return "Vollständig Geimpft pro 100 Personen";
-      case "doses": return "Verimpfte Dosen pro 100 Personen";
-      case "rawdoses": return "Verimpfte Dosen";
-      default: return "";
-    }
-  }
-
-  $scope.update = function() {
-    if($scope.cantons.length==0) {
-      var cantons = locationData.administered.map(d=>d.geoRegion);
-      var unique = cantons.filter((v, i, a) => a.indexOf(v) === i);
-      $scope.cantons = unique;
-      if($scope.selectedCanton=="") $scope.selectedCanton = $scope.cantons[$scope.cantons.length-1];
-    }
-    let dataToUse = locationData.administered;
-    let filterDate = dataToUse[dataToUse.length-1].date;
-    dataToUse = dataToUse.filter(d=> d.geoRegion==$scope.selectedCanton && d.date==filterDate);
-    // $scope.series[0] = $scope.set==1?'Fälle':($scope.set==2?'Todesfälle':($scope.set==3?'Inzidenz':'Hospitalisierungen'));
-    // let index = dataToUse.length-6;
-    // if($scope.duration==2) index = dataToUse.findIndex(d=> d.date == "2020-05-31");
-    // else if($scope.duration==4) index = dataToUse.length-11;
-    // let firstData = dataToUse[index];
-    // let latestData = dataToUse[dataToUse.length-1];
-    for(var i=0; i<locations.length; i++) {
-      let label = locations[i];
-      let entry = dataToUse.filter(d => d.location==label);
-      let value = Math.round(parseFloat(entry[0].prctSumTotal)*10)/10;
-      $scope.data[0][i] = value;
-    }
-    //$scope.options.scales.yAxes[0].ticks.suggestedMax = 100;
-    //$scope.options.plugins.datalabels = getDataLabels(true);
-
-    //var dataset = $scope.set==0?"Vollständig geimpfte Personen":$scope.set==1?"Impfdosen":"";
-    //var time = $scope.duration==1?"Ganze Pandemie":$scope.duration==2?"Ab Juni":$scope.duration==3?"Letzte 7 Tage":"Letzte 14 Tage";
-    var filterDateYear = parseInt(filterDate.substring(0,4));
-    var filterDateWeek = parseInt(filterDate.substring(4));
-    var monday = getDateOfISOWeek(filterDateWeek, filterDateYear);
-    var sunday = new Date(monday);
-    sunday.setDate(sunday.getDate()+6);
-    $scope.options.title.text = "Ortsverteilung der verabreichten Dosen bis "+formatDate(sunday); //+" "+time;
+    $scope.options.title.text = "Altersverteilung "+$scope.getName($scope.dataset)+" bis "+formatDate(sunday)+" (laufende Woche)"; //+" "+time;
   }
 }]);
 
@@ -610,6 +411,10 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
   }
 
   $scope.type = "bar";
+
+  $scope.dataset = "booster";
+  $scope.mode = "daily";
+  $scope.smode = "number";
 
   $scope.data = [0];
 
@@ -675,19 +480,48 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
       }
     }
   };
+
+  $scope.getName = function(dataset) {
+    switch (dataset) {
+      case "full": text = "Vollständig geimpfte Personen"; break;
+      case "administered": text = "Verimpfte Dosen"; break;
+      case "booster": text = "Geboosterte Personen"; break;
+      default: text = "";
+    }
+    switch($scope.smode) {
+      case "%": text += " (in % der Bevölkerung)"; break;
+      case "%12": text += " (in % der Bevölkerung ab 12 Jahren)"; break;
+      default: text += "";
+    }
+    if($scope.mode=="daily") text+=" pro Tag";
+    return text;
+  }
+
   $scope.datasetOverride = [{
-      label: "Totale Impfungen",
+      label: $scope.getName($scope.dataset),
       fill: false,
       cubicInterpolationMode: 'monotone',
       spanGaps: true
   }];
+
+
 
   //$scope.colors = [ 'white' ];
   $scope.update = function() {
     //console.log("Update");
     $scope.data = [];
     $scope.datasetOverride = [];
-    var dataToUse = verlaufData.administered;
+    let dataToUse;
+    if($scope.dataset=="administered") {
+      dataToUse = verlaufData.administered;
+    }
+    let ageGroup = $scope.smode=="%12"?"12+":"total_population";
+    if($scope.dataset=="full") {
+      dataToUse = verlaufData.full.filter(d=>d.type=="COVID19FullyVaccPersons" && d.age_group==ageGroup);
+    }
+    else if($scope.dataset == "booster") {
+      dataToUse = verlaufData.full.filter(d=>d.type=="COVID19FirstBoosterPersons" && d.age_group==ageGroup);
+    }
     let filteredData = dataToUse.filter(d => d.geoRegion===$scope.selectedCanton);
     filteredData.shift(); //remove first element
     //console.log(filteredData);
@@ -699,23 +533,50 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
       var year = parseInt(dateSplit[0]);
       return new Date(year,month,day);
     });
-    $scope.datasetOverride = [
-    {
-      label: "7d-Durchschnitt",
-      type: 'line',
-      fill: false,
-    },
-    {
-        label: "Verimpfte Dosen",
-        type: 'bar',
-        backgroundColor: $scope.barColor,
-        //cubicInterpolationMode: 'monotone',
-        //spanGaps: true
-    }
-    ];
     $scope.data = [];
-    $scope.data.push(filteredData.map(d => d.mean7d));
-    $scope.data.push(filteredData.map((d,index) => d.entries!="NA"?d.entries:d.sumTotal)); //(index==0?d.entries:d.mean7d)
+    if($scope.mode=="sum") {
+      $scope.datasetOverride = [
+        {
+          label: $scope.getName($scope.dataset),
+          type: 'line',
+          fill: false,
+          backgroundColor: $scope.barColor,
+        }
+      ];
+      $scope.colors = [$scope.barColor];
+      let data;
+      if($scope.smode.charAt(0)=='%') {
+        data = filteredData.map(d => d.per100PersonsTotal);
+      } else {
+        data = filteredData.map(d => d.sumTotal);
+      }
+      //console.log(data);
+      $scope.data.push(data);
+    }
+    else {
+      $scope.datasetOverride = [
+      {
+        label: "7d-Durchschnitt",
+        type: 'line',
+        fill: false,
+      },
+      {
+          label: $scope.getName($scope.dataset),
+          type: 'bar',
+          backgroundColor: $scope.barColor,
+          //cubicInterpolationMode: 'monotone',
+          //spanGaps: true
+      }
+      ];
+      $scope.colors = [$scope.lineColor, $scope.barColor];
+      if($scope.smode.charAt(0)=='%') {
+        $scope.data.push(filteredData.map(d => d.per100Persons_mean7d));
+        $scope.data.push(filteredData.map(d => d.per100Persons));
+      } else {
+        $scope.data.push(filteredData.map(d => d.mean7d));
+        $scope.data.push(filteredData.map(d => d.entries)); //(index==0?d.entries:d.mean7d)
+      }
+    }
   }
 
 }]);

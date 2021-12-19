@@ -75,46 +75,49 @@
           </tbody>
         </table>
       </article>
-      <article id="speed">
-        <h3 id="title">Geschwindigkeit</h3>
-        <table class="wide">
-          <thead>
-            <tr>
-              <th><span>Kanton</span></th>
-              <th class="total"><span>Ø Dosen pro Tag</span></th>
-              <th class="total"><span>% der Bevölkerung</span></th>
-              <th class="total"><span>7d-Ø Dosen pro Tag</span></th>
-              <th class="total"><span>% der Bevölkerung</span></th>
-            </tr>
-          </thead>
-          <tbody id="speedtabelle">
-          </tbody>
-        </table>
-      </article>
-      <article id="calculator" ng-controller="SpeedCtrl">
-        <h3 id="title">Impfgeschwindigkeitsrechner</h3>
-        <table>
-          <tr><td>Bereits verimpfte Dosen ({{dateNow | date:'dd.MM.yyyy'}}):</td><td><input type="text" ng-model="dosesTillNow"/></td></tr>
-          <tr><td><b>Zielparameter</b></td></tr>
-          <tr><td>Einwohner:</td><td><input type="text" ng-model="population"/></td></tr>
-          <tr><td>Prozent geimpfter Einwohner:</td><td><input type="text" ng-model="percent"/></td></tr>
-          <tr><td>Benötigte Dosen (2 Dosen pro Person):</td><td>{{dosesNeeded()}}</td></tr>
-          <tr><td>Geschwindigkeit (Dosen pro Tag):</td><td><input type="text" ng-model="dosesPerDay"/></td></tr>
-          <tr><td><b>Ziel erreicht</b></td></tr>
-          <tr><td>Tage bis Ziel erreicht:</td><td>{{daysTillGoal()}}</td></tr>
-          <tr><td>Datum:</td><td>{{dateOfGoal()}}</td></tr>
-        </table>
-        <div id="calculatorlocationcontrol">
+    </section>
+    <section id="detail">
+      <header>
+  			<h2>Verlauf</h2>
+      </header>
+      <article ng-controller="ChartCtrl" id="interactive2">
+        <h3><span class="flag {{selectedCanton}}">&nbsp;</span> {{getName(dataset)}}</h3>
+        <div class="canvascontainer">
+          <canvas id="angularcanvas" class="chart chart-bar angularchart" chart-colors="colors" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride"></canvas>
+        </div>
+        <div id="controls">
+          <div class="angulardiv">
+            <span class="chartHeading">Kanton:</span>
+              <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+            <!-- <button class="controlButton" ng-click="showAllCantons()">Alle</button>
+            <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
+          </div>
           <div class="rowdiv">
-            <span class="barChartControl barChartHeading cell">Kanton:</span>
+            <span class="barChartControl barChartHeading cell">Datensatz:</span>
             <span class="cell">
-              <button class="barChartControl" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
+              <button class="barChartControl" ng-click="dataset='full';update()" ng-class="dataset=='full'?'active':''">{{getName('full')}}</button>
+              <button class="barChartControl" ng-click="dataset='booster';update()" ng-class="dataset=='booster'?'active':''">{{getName('booster')}}</button>
+              <button class="barChartControl" ng-click="dataset='administered';update()" ng-class="dataset=='administered'?'active':''">{{getName('administered')}}</button>
+            </span>
+          </div>
+          <div class="rowdiv">
+            <span class="barChartControl barChartHeading cell">Modus:</span>
+            <span class="cell">
+              <button class="barChartControl" ng-click="mode='daily';update()" ng-class="mode=='daily'?'active':''">pro Tag</button>
+              <button class="barChartControl" ng-click="mode='sum';update()" ng-class="mode=='sum'?'active':''">Total</button>
+            </span>
+          </div>
+          <div class="rowdiv">
+            <span class="barChartControl barChartHeading cell"></span>
+            <span class="cell">
+              <button class="barChartControl" ng-click="smode='number';update()" ng-class="smode=='number'?'active':''">Anzahl</button>
+              <button class="barChartControl" ng-click="smode='%';update()" ng-class="smode=='%'?'active':''">% der Bevölkerung</button>
+              <button class="barChartControl" ng-click="smode='%12';update()" ng-class="smode=='%12'?'active':''">% der Bevölkerung ab 12 Jahren</button>
             </span>
           </div>
         </div>
       </article>
     </section>
-    </div>
     <section>
       <header>
 				<h2>Altersverteilung</h2>
@@ -140,41 +143,7 @@
         </div>
       </article>
     </section>
-    <section>
-      <header>
-				<h2>Impforte</h2>
-			</header>
-      <article id="locationdiv" ng-controller="LocationCtrl">
-        <canvas id="locationcanvas" class="agecanvas chart chart-base" chart-type="type" chart-data="data" chart-colors="colors" chart-labels="labels" chart-series="series" chart-options="options"></canvas>
-        <div id="locationcontrols">
-          <div class="rowdiv">
-            <span class="barChartControl barChartHeading cell">Kanton:</span>
-            <span class="cell">
-              <button class="barChartControl" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
-            </span>
-          </div>
-        </div>
-      </article>
-    </section>
-    <section id="detail">
-      <header>
-  			<h2>Verlauf</h2>
-      </header>
-      <article ng-controller="ChartCtrl" id="interactive2">
-        <h3><span class="flag {{selectedCanton}}">&nbsp;</span> Verimpfte Dosen pro Tag</h3>
-        <div class="canvascontainer">
-          <canvas id="angularcanvas" class="chart chart-bar angularchart" chart-colors="colors" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride"></canvas>
-        </div>
-        <div id="controls">
-          <div class="angulardiv">
-            <span class="chartHeading">Kanton:</span>
-              <button class="internationalButton rightButton" ng-repeat="canton in cantons" ng-click="selectCanton(canton)" ng-class="selectedCanton==canton?'active':''">{{canton}}</button>
-            <!-- <button class="controlButton" ng-click="showAllCantons()">Alle</button>
-            <button class="controlButton" ng-click="showNoCanton()">Keiner</button> -->
-          </div>
-        </div>
-      </article>
-    </section>
+    </div>
   </main>
   <footer id="page-footer">
 		<p>
