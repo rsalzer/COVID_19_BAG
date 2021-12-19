@@ -412,7 +412,7 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
 
   $scope.type = "bar";
 
-  $scope.dataset = "booster";
+  $scope.dataset = "full";
   $scope.mode = "daily";
   $scope.smode = "number";
 
@@ -481,13 +481,14 @@ app.controller('ChartCtrl', ['$scope', function ($scope) {
     }
   };
 
-  $scope.getName = function(dataset) {
+  $scope.getName = function(dataset,short) {
     switch (dataset) {
       case "full": text = "Vollständig geimpfte Personen"; break;
       case "administered": text = "Verimpfte Dosen"; break;
       case "booster": text = "Geboosterte Personen"; break;
       default: text = "";
     }
+    if(short) return text;
     switch($scope.smode) {
       case "%": text += " (in % der Bevölkerung)"; break;
       case "%12": text += " (in % der Bevölkerung ab 12 Jahren)"; break;
