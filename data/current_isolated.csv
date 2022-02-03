@@ -3,7 +3,7 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2022-02-01,AI,56,15,0
 2022-02-01,AR,223,66,0
 2022-02-01,BE,14075,6040,0
-2022-02-01,BL,3390,746,0
+2022-02-02,BL,3835,859,0
 2022-02-01,BS,1247,705,Keine aktuellen Daten gemeldet
 2022-02-01,FL,247,293,0
 2022-02-01,FR,3088,4879,Keine aktuellen Daten gemeldet
@@ -20,4 +20,5 @@ date,abbreviation_canton_and_fl,current_isolated,current_quarantined,foreign_qua
 2022-02-01,TG,2061,1956,0
 2022-02-01,VD,35239,16888,0
 2022-02-01,VS,2246,1212,0
+2022-02-02,ZG,2132,618,0
 2022-02-01,ZH,15675,14549,0
