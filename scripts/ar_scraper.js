@@ -99,7 +99,7 @@ async function finishedSingleDownload(body, whichData, list) {
 }
 
 function finishedDownloading() {
-  console.log("Finished Downloading");
+  //console.log("Finished Downloading");
   whichCantons.forEach((whichCanton) => {
     var singleData = data[whichCanton];
     var consolidated = singleData.ncumul_conf;
@@ -135,7 +135,7 @@ function finishedDownloading() {
       csvtext += line;
     });
 
-    console.log(csvtext);
+    //console.log(csvtext);
 
     fs.writeFileSync(`../data/${whichCanton.toLowerCase()}.csv`, csvtext);
   });
