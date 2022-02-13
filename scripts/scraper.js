@@ -29,9 +29,13 @@ const arDownload = require('./ar_scraper');
 
 const cantons = ['AG', 'AI', 'AR', 'BE', 'BL', 'BS', 'FR', 'GE', 'GL', 'GR', 'JU', 'LU', 'NE', 'NW', 'OW', 'SG', 'SH', 'SO', 'SZ', 'TG', 'TI', 'UR', 'VD', 'VS', 'ZG', 'ZH', 'FL'];
 const bagExcelLocation = "https://www.bag.admin.ch/dam/bag/de/dokumente/mt/k-und-i/aktuelle-ausbrueche-pandemien/2019-nCoV/covid-19-datengrundlage-lagebericht.xlsx.download.xlsx/200325_Datengrundlage_Grafiken_COVID-19-Bericht.xlsx";
+const bagHistoryMetaLocation = "https://www.covid19.admin.ch/api/data/context/history";
 
 const ageLabels = ["0-9","10-19","20-29","30-39","40-49","50-59","60-69","70-79","80+"];
 var appendToFiles = false;
+let force = false;
+let date_now;
+let date_context;
 
 var myArgs = process.argv.slice(2);
 switch (myArgs[0]) {
@@ -41,8 +45,13 @@ case 'download':
       appendToFiles = true;
     }
     if(myArgs[1] == "force") {
-      downloadFile();
-      return;
+      force = true;
+    }
+    if(myArgs[1] == "single") {
+      date_context = myArgs[2];
+      let url = myArgs[3];
+      downloadContextJSON(url);
+      break;
     }
     checkIfFileNeedsToBeDownloaded();
     break;
@@ -65,48 +74,164 @@ default:
     rl.close();
 }
 
+
 function checkIfFileNeedsToBeDownloaded() {
   console.log("** Checking if today has already been downloaded **");
-  fs.readFile('../data/deaths.csv', 'utf-8', function(err, data) {
-      if (err) throw err;
-
-      var lines = data.trim().split('\n');
-      var lastLine = lines.slice(-1)[0];
-
-      var fields = lastLine.split(',');
-      var fileDate = fields[0];
-
-      let date_ob = new Date();
-      let date_now = date_ob.toISOString().substring(0,10);
-      console.log("Server time: "+date_ob.toString());
-      console.log("Server time ISO: "+date_ob.toISOString());
-      console.log("Date now = "+date_now);
-      console.log("FileDate = "+fileDate);
-
-      if(date_now!=fileDate) {
-        console.log("We have not got today yet: Download BAG-File");
-        downloadFile();
-      }
-      else {
-        console.log("We already got today ... do nothing");
-        core.setOutput('newdata', 0);
-        rl.close();
-        core.setFailed("We already got today ... do nothing");
-      }
-    });
+  fs.readFile('label.json', (err, data) => {
+    if (err) throw err;
+    let label = JSON.parse(data);
+    let date_ob = new Date();
+    date_now = date_ob.toISOString().substring(0,10);
+    let fileDate = label.message;
+    console.log("Server time: "+date_ob.toString());
+    console.log("Server time ISO: "+date_ob.toISOString());
+    console.log("Date now = "+date_now);
+    console.log("Last update: "+fileDate);
+    if(date_now!=fileDate) {
+      console.log("We have not got today ("+date_now+") yet: Download BAG-Meta-File");
+      downloadHistoryJSON(date_now);
+    }
+    else {
+      console.log("We already got today ... do nothing");
+      core.setOutput('newdata', 0);
+      rl.close();
+      core.setFailed("We already got today ... do nothing");
+    }
+  });
 }
 
-function downloadFile() {
-  const file = fs.createWriteStream("temp.xlsx");
-  const request = https.get(bagExcelLocation, function(response) {
+function downloadHistoryJSON(dateNeeded) {
+  https.get(bagHistoryMetaLocation,(res) => {
+    let body = "";
+
+    res.on("data", (chunk) => {
+        body += chunk;
+    });
+
+    res.on("end", () => {
+      try {
+        let metaHistoryFile = JSON.parse(body);
+        let contexts = metaHistoryFile.dataContexts;
+        let latest = contexts[0];
+        date_context = latest.date;
+        console.log("Date of latest Context-File: "+date_context);
+        if(!force && date_context!=dateNeeded) {
+          console.log('\x1b[41m%s\x1b[0m', "No new data ... doing nothing!");
+          core.setOutput('newdata', 0);
+          rl.close();
+          core.setFailed("No new data ... doing nothing!");
+          return;
+        }
+        downloadContextJSON(latest.dataContextUrl);
+      } 
+      catch (error) {
+        console.error(error.message);
+        rl.close();
+        core.setFailed("Error when parsing History-Meta-JSON");
+      };
+    });
+
+  }).on("error", (error) => {
+    console.error(error.message);
+    rl.close();
+    core.setFailed("Error when downloading History-Meta-JSON");
+  });
+}
+
+function downloadContextJSON(url) {
+  console.log("Downloading Context-File of today: "+url);
+  https.get(url,(res) => {
+    let body = "";
+
+    res.on("data", (chunk) => {
+        body += chunk;
+    });
+
+    res.on("end", () => {
+        try {
+            let metaFile = JSON.parse(body);
+            // var metaDate = metaFile.sourceDate;
+            // var dataVersion = metaFile.dataVersion;
+            var casesSource = metaFile.sources.individual.csv.daily.cases;
+            console.log(casesSource);
+            // var deathSource = metaFile.sources.individual.csv.daily.death;
+            // var hospCapacitySource = metaFile.sources.individual.csv.daily.hospCapacity;
+            downloadCases(casesSource);
+            //downloadFiles([["ncumul_conf", casesSource]]); //, ["ncumul_deceased", deathSource], ["hospCapacity", hospCapacitySource]]);
+        } catch (error) {
+            console.error(error.message);
+        };
+    });
+
+  }).on("error", (error) => {
+    console.error(error.message);
+    rl.close();
+    core.setFailed("Error when downloading Todays Context-File");
+  });
+}
+
+function downloadFile(name, url) {
+  console.log("Downloading: "+name);
+  const file = fs.createWriteStream(name);
+  const request = https.get(url, function(response) {
       response.pipe(file);
 
       file.on('finish', function() {
-        console.log("Finish downloading");
-        if(appendToFiles) parseExcel();
-        else rl.close();
+        console.log("Finished downloading: "+name);
       });
+  }).on("error", (error) => {
+    console.error(error.message);
+    rl.close();
+    core.setFailed("Error when downloading "+name+" at url: "+url);
   });
+}
+
+async function downloadCases(source) {
+  https.get(source,(res) => {
+    let body = "";
+
+    res.on("data", (chunk) => {
+        body += chunk;
+    });
+
+    res.on("end", () => {
+        parseCasesCSV(body);
+    });
+
+  }).on("error", (error) => {
+      console.error(error.message);
+  });
+}
+
+async function parseCasesCSV(fileContent) {
+  let json = await csv().fromString(fileContent);
+  let dateObj = {};
+  dateObj.date = date_context;
+  cantons.forEach( (canton) => {
+    var filtered = json.filter(d => d.geoRegion==canton);
+    var last = filtered[filtered.length-1];
+    var obj = {};
+    obj.date = last.datum;
+    obj.cases = last.sumTotal;
+    dateObj[canton] = obj;
+    console.log(canton+" ("+obj.date+"): "+obj.cases);
+    if(obj.date!=dateObj.date) console.error("Not same date as Context!!");
+  });
+  var cantonRow = makeCantonCSVRow(dateObj);
+  console.log("Canton row: "+cantonRow);
+  console.log("** Appending to files **");
+  fs.appendFileSync('../data/casesPerCanton.csv', '\r\n'+cantonRow);
+  fs.readFile('label.json', (err, data) => {
+    if (err) throw err;
+    let label = JSON.parse(data);
+    console.log(label);
+    label.message = date_context;
+    fs.writeFileSync('label.json', JSON.stringify(label));
+  });
+  tweetNewNumbers();
+  arDownload.start(['AR','VD']);
+  core.setOutput('newdata', 1);
+  rl.close();
 }
 
 function downloadTestcasesFile() {
@@ -452,7 +577,7 @@ function tweetNewNumbers() {
       }
       console.log(diffString);
       console.log("Length of tweet:"+diffString.length);
-      tweet(diffString);
+      //tweet(diffString);
       //rl.close();
       // rl.question("Should I tweet it? (y/n)", function(name) {
       //       if(name=="y") {
