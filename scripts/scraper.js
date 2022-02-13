@@ -577,7 +577,7 @@ function tweetNewNumbers() {
       }
       console.log(diffString);
       console.log("Length of tweet:"+diffString.length);
-      //tweet(diffString);
+      tweet(diffString);
       //rl.close();
       // rl.question("Should I tweet it? (y/n)", function(name) {
       //       if(name=="y") {
