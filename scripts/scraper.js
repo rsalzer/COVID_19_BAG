@@ -230,6 +230,7 @@ async function parseCasesCSV(fileContent) {
   });
   tweetNewNumbers();
   arDownload.start(['AR','VD']);
+  core.exportVariable('date', date_context);
   core.setOutput('newdata', 1);
   rl.close();
 }
