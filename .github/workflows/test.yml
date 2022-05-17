@@ -37,7 +37,7 @@ jobs:
         
     - name: Commit and push to repo
       if: steps.parsing.outputs.newdata == 1 # only try to commit if there are actually changes
-      uses: github-actions-x/commit@v2.6
+      uses: github-actions-x/commit@v2.9
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         push-branch: master
