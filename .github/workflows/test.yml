@@ -1,5 +1,7 @@
 name: BAG-Scraper and Parser
 on:
+  schedule:
+     - cron: '*/5 11-15 * * 2'
   workflow_dispatch:
   
 jobs:
